@@ -138,8 +138,10 @@ void handle_input() {
                     }
                 }
                 if (event.key.keysym.sym == BTN_A) {
-                    if(section_index == max_entry-1) done = 1;
-                    else if(is_open_setting == 1 && setting_index == 0 && is_open_file_list == 1) {
+                    if(section_index == max_entry-1) {
+                        done = 1;
+                        system("sync; mount -o remount,ro $HOME; poweroff");
+                    } else if(is_open_setting == 1 && setting_index == 0 && is_open_file_list == 1) {
                         install_ipk();
                     } else if(is_open_setting == 1 && setting_index == 0) {
                         is_open_file_list = 1;
