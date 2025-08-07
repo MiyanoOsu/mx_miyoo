@@ -1,0 +1,4 @@
+title=gambatte
+exec=/mnt/emus/gambatte/gambatte
+selectordir=/mnt/roms/GB_GBC
+selectorelement=18

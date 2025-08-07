@@ -1,0 +1,4 @@
+title=gpsp
+exec=/mnt/emus/gpsp/gpsp
+selectordir=/mnt/roms/GBA
+selectorelement=28
