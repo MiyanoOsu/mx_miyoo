@@ -1,0 +1,35 @@
+#ifndef _MX_H_
+#define _MX_H_
+
+extern u8 max_entry;
+extern u8 max_link;
+extern u16 max_rom_list;
+extern u16 max_list_file;
+extern u16 max_file_list;
+
+void add_section(const char *name);
+void load_section();
+void load_list_app(u8 order);
+void clear_list_app();
+void load_rom_list();
+void clear_list_rom();
+void get_command();
+void run_command();
+void clear_file_list();
+void install_ipk();
+void load_install_list();
+void load_bg_list();
+void load_default_bg();
+void set_bg();
+void load_font_list();
+void load_default_font();
+void set_font();
+
+u8 get_battery_status();
+u8 get_backlight_value();
+void set_backlight_value(u8 val);
+u8 get_volume_value();
+void set_volume_value(u8 val);
+
+
+#endif // _MX_H_
