@@ -177,7 +177,7 @@ void handle_input() {
                             load_list_app(section_index);
                             if(max_link == 0 && section_index != max_entry - 2)
                                 is_empty_link = 1;
-                        } else if(is_open_link == 1 && is_open_rom == 0) {
+                        } else if(is_open_link == 1 && is_open_rom == 0 && is_open_install == 0) {
                             get_command();
                             if(have_load_folder == 1) {
                                 is_open_rom = 1;
@@ -188,7 +188,7 @@ void handle_input() {
                                 run_command();
                             }
                         } else if(is_empty_rom_folder) {
-                        } else{
+                        } else if(is_open_install == 0){
                             run_command();
                         }
                     }
