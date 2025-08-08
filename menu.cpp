@@ -21,6 +21,7 @@ char *list_link[64] = {NULL};
 char *list_name[256] = {NULL};
 char *list_rom[256] = {NULL};
 char *list_file[256] = {NULL};
+char *install_info[256] = {NULL};
 
 const char *remap[35] = {
     "UP:  %s",
@@ -220,11 +221,17 @@ void draw_menu() {
             }
             for(u8 i = file_list_offset; i < end; i++) {
                 if(i == file_list_index)
-                    draw_string(list_file[i], layout, 35, 15 + (i - file_list_offset) * 20, 0, 255, 255);
+                    draw_string(list_file[i], layout, 35, 20 + (i - file_list_offset) * 20, 0, 255, 255);
                 else
-                    draw_string(list_file[i], layout, 35, 15 + (i - file_list_offset) * 20, 255, 255, 255);
+                    draw_string(list_file[i], layout, 35, 20 + (i - file_list_offset) * 20, 255, 255, 255);
             }
         }
+    }
+
+    if(is_open_install) {
+        SDL_FillRect(layout, NULL, SDL_MapRGB(layout->format,0,0,0));
+        for(u8 i = 0; i < current_line;i++)
+            draw_string(install_info[i],layout,20,20 + i*20,255,255,255);
     }
 
     SDL_BlitSurface(battery_state, NULL, layout,[](){

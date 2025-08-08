@@ -6,6 +6,7 @@ extern u8 max_link;
 extern u16 max_rom_list;
 extern u16 max_list_file;
 extern u16 max_file_list;
+extern u8 current_line;
 
 void add_section(const char *name);
 void load_section();
@@ -16,6 +17,7 @@ void clear_list_rom();
 void get_command();
 void run_command();
 void clear_file_list();
+void clear_install_info();
 void install_ipk();
 void load_install_list();
 void load_bg_list();

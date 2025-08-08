@@ -23,6 +23,7 @@ u8 is_open_setting = 0;
 u8 is_open_file_list = 0;
 u8 is_empty_folder_file = 0;
 u8 is_open_remap = 0;
+u8 is_open_install = 0;
 u8 message_waiting = 0;
 
 SDLKey wait_for_key_input() {
@@ -140,8 +141,9 @@ void handle_input() {
                 if (event.key.keysym.sym == BTN_A) {
                     if(section_index == max_entry-1) {
                         done = 1;
-                        system("sync; mount -o remount,ro $HOME; poweroff");
-                    } else if(is_open_setting == 1 && setting_index == 0 && is_open_file_list == 1) {
+                        //system("sync; mount -o remount,ro $HOME; poweroff");
+                    } else if(is_open_setting == 1 && setting_index == 0 && is_open_file_list == 1 && is_open_install == 0) {
+                        is_open_install = 1;
                         install_ipk();
                     } else if(is_open_setting == 1 && setting_index == 0) {
                         is_open_file_list = 1;
@@ -198,6 +200,9 @@ void handle_input() {
                         link_index = 0;
                         if(max_link == 0 && section_index != max_entry - 2)
                             is_empty_link = 0;
+                    } else if(is_open_install == 1) {
+                        is_open_install = 0;
+                        clear_install_info();
                     } else if(is_open_file_list == 1) {
                         is_open_file_list = 0;
                         clear_file_list();

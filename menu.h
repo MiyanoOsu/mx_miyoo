@@ -12,6 +12,7 @@ extern char* list_name[];
 extern char* list_link[];
 extern char* list_rom[];
 extern char* list_file[];
+extern char* install_info[];
 
 extern char background_path[];
 extern char font_path[];

@@ -20,6 +20,8 @@ u16 max_rom_list = 0;
 u8 have_load_folder = 0;
 u16 max_file_list = 0;
 
+u8 current_line = 0;
+
 char command[512];
 char dir[256];
 char background_path[128];
@@ -254,11 +256,34 @@ void clear_file_list() {
     is_empty_folder_file = 0;
 }
 
+void clear_install_info() {
+    for(u16 i = 0; i < current_line; i++) {
+        free(install_info[i]);
+        install_info[i] = NULL;
+    }
+    current_line = 0;
+}
+
 void install_ipk() {
-    char cmd[512] = "opkg install --force-reinstall --force-overwrite \"install\\";
+    char cmd[512] = "/usr/bin/opkg install --force-reinstall --force-overwrite \"/mnt/apps/mx/install/";
     strcat(cmd,list_file[file_list_index]);
     strcat(cmd, "\"");
-    printf("%s\n",cmd);
+    FILE *fp;
+    char buffer[256];
+
+    fp = popen(cmd,"r");
+    if (fp == NULL) {
+        perror("popen failed");
+        return;
+    }
+    while (fgets(buffer, sizeof(buffer), fp) != NULL) {
+        buffer[strcspn(buffer, "\n")] = '\0';
+        install_info[current_line] = (char *)malloc(strlen(buffer) + 1);
+        strcpy(install_info[current_line],buffer);
+        current_line++;
+        update_video();
+    }
+    pclose(fp);
 }
 
 void load_install_list() {
