@@ -7,6 +7,7 @@
 #include <dirent.h>
 #include <sys/ioctl.h>
 #include <libgen.h>
+#include <sys/mount.h>
 
 #define MIYOO_BATTERY   "/sys/class/power_supply/miyoo-battery/voltage_now"
 #define MIYOO_LID_CONF  "/sys/class/backlight/backlight/brightness"
@@ -288,7 +289,9 @@ void install_ipk() {
     strcat(cmd, "\"");
     FILE *fp;
     char buffer[256];
-    system("mount -oremount,rw /");
+    if (mount("/", "/", NULL, MS_REMOUNT, NULL) != 0)
+        perror("remount as rw failed");
+
     fp = popen(cmd,"r");
     if (fp == NULL) {
         perror("popen failed");
@@ -301,7 +304,8 @@ void install_ipk() {
         update_video();
     }
     pclose(fp);
-    system("mount -oremount,ro /");
+    if (mount("/", "/", NULL, MS_REMOUNT | MS_RDONLY, NULL) != 0)
+        perror("remount as ro failed");
     install_done = 1;
 }
 
@@ -309,26 +313,31 @@ void uninstall_ipk() {
     char cmd[256];
     char package[128];
     char buffer[128];
-    strcpy(cmd,"/usr/bin/opkg search \"*");
-    strcat(cmd, basename(package_name[link_index]));
-    strcat(cmd,"\" | cut -f1 -d' '");
+
+    snprintf(cmd, sizeof(cmd), "/usr/bin/opkg search \"*%s\" | cut -f1 -d' '",basename(package_name[link_index]));
+
     FILE *fp = popen(cmd,"r");
     if (fp == NULL) {
         perror("popen failed");
         return;
     }
+
     if (fgets(buffer, sizeof(buffer), fp) != NULL) {
         strcpy(package, buffer);
     }
+    
+    pclose(fp);
+
     if(package[0] == '\0') {
         printf("Package not found!");
         is_open_install = 0;
         return;
     }
-    pclose(fp);
-    system("mount -oremount,rw /");
-    strcpy(cmd,"/usr/bin/opkg remove ");
-    strcat(cmd,package);
+
+    if (mount("/", "/", NULL, MS_REMOUNT, NULL) != 0)
+        perror("remount as rw failed");
+
+    snprintf(cmd, sizeof(cmd),"/usr/bin/opkg remove %s",package);
     fp = popen(cmd,"r");
     if (fp == NULL) {
         perror("popen failed");
@@ -341,7 +350,9 @@ void uninstall_ipk() {
         update_video();
     }
     pclose(fp);
-    system("mount -oremount,ro /");
+    if (mount("/", "/", NULL, MS_REMOUNT | MS_RDONLY, NULL) != 0)
+        perror("remount as ro failed");
+
     install_done = 1;
 }
 
