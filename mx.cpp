@@ -265,7 +265,7 @@ void clear_install_info() {
 }
 
 void install_ipk() {
-    char cmd[512] = "/usr/bin/opkg install --force-reinstall --force-overwrite \"/mnt/apps/mx/install/";
+    char cmd[512] = "/usr/bin/opkg install --force-reinstall --force-overwrite \"install/";
     strcat(cmd,list_file[file_list_index]);
     strcat(cmd, "\"");
     FILE *fp;

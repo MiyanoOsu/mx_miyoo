@@ -3,7 +3,7 @@
 
 #include <SDL/SDL.h>
 
-extern SDL_Surface *screen, *layout,*background, *layout_bg, *battery_state;
+extern SDL_Surface *screen, *layout, *layout_bg, *battery_state;
 
 void load_bg();
 void set_transparent();
