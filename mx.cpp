@@ -103,14 +103,27 @@ void get_list_apps(char * open_directory, u8 *out_count, char **list) {
                 printf("Check path pls");
                 return;
             }
+            u8 checked = 0;
             if(is_open_rom == 0) {
                 while (fgets(line, sizeof(line), file)) {
                     if (line[0] == '\0') break; // exit if file is empty
-                    if (strncmp(line, "title=", 6) == 0) {
-                        line[strcspn(line, "\r\n")] = '\0'; // remove newline character
-                        list_name[count] = strdup(directory_entry->d_name);
-                        list[count++] = strdup(line + 6);
-                        break;
+                    line[strcspn(line, "\n")] = '\0';
+                    if(checked) {
+                        if (strncmp(line, "title=", 6) == 0) {
+                            list_name[count] = strdup(directory_entry->d_name);
+                            list[count++] = strdup(line + 6);
+                            checked = 0;
+                            break;
+                        }
+                    } else {
+                        if (strncmp(line, "exec=", 5) == 0) {
+                            struct stat st;
+                            if (stat(line + 5, &st) == 0 && S_ISREG(st.st_mode)) {
+                                checked = 1;
+                                rewind(file);
+                                continue;
+                            }
+                        }
                     }
                 }
             }
@@ -168,7 +181,7 @@ void get_command() {
     }
     char line[128];
     while(fgets(line,sizeof(line),file)) {
-        line[strcspn(line, "\r\n")] = '\0';
+        line[strcspn(line, "\n")] = '\0';
         if (strncmp(line,"exec=", 5) == 0) {
             strcpy(command,".");
             strcat(command, strrchr(line + 5, '/'));
@@ -270,7 +283,7 @@ void install_ipk() {
     strcat(cmd, "\"");
     FILE *fp;
     char buffer[256];
-
+    system("mount -oremount,rw /");
     fp = popen(cmd,"r");
     if (fp == NULL) {
         perror("popen failed");
@@ -278,12 +291,12 @@ void install_ipk() {
     }
     while (fgets(buffer, sizeof(buffer), fp) != NULL) {
         buffer[strcspn(buffer, "\n")] = '\0';
-        install_info[current_line] = (char *)malloc(strlen(buffer) + 1);
-        strcpy(install_info[current_line],buffer);
+        install_info[current_line] = strdup(buffer);
         current_line++;
         update_video();
     }
     pclose(fp);
+    system("mount -oremount,ro /");
 }
 
 void load_install_list() {
