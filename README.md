@@ -7,7 +7,7 @@ Target v90 q90 q20
 
 # How to use
 
-Copy all forder in source code to same folder of binary to run, also all sections in gmenu2x folder to sections to add all your sections from gmenu2x
+Copy all forder in source code to same folder of binary to run, also copy all sections in gmenu2x folder to sections folder to add all your sections from gmenu2x
 
 if you want to boot to MX when open handheld, just copy file autoexec.sh to folder MAIN
 
