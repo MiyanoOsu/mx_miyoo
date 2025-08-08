@@ -21,12 +21,15 @@ u8 have_load_folder = 0;
 u16 max_file_list = 0;
 
 u8 current_line = 0;
+u8 install_done = 0;
 
 char command[512];
 char dir[256];
 char background_path[128];
 char font_path[256];
 char binary_path [256];
+
+char *package_name[256] = {NULL};
 
 char **get_section_name(u8 *out_count) {
     struct dirent *directory_entry;  // Pointer for directory entry
@@ -119,6 +122,7 @@ void get_list_apps(char * open_directory, u8 *out_count, char **list) {
                         if (strncmp(line, "exec=", 5) == 0) {
                             struct stat st;
                             if (stat(line + 5, &st) == 0 && S_ISREG(st.st_mode)) {
+                                package_name[count] = strdup(line+5);
                                 checked = 1;
                                 rewind(file);
                                 continue;
@@ -275,6 +279,7 @@ void clear_install_info() {
         install_info[i] = NULL;
     }
     current_line = 0;
+    install_done = 0;
 }
 
 void install_ipk() {
@@ -297,6 +302,47 @@ void install_ipk() {
     }
     pclose(fp);
     system("mount -oremount,ro /");
+    install_done = 1;
+}
+
+void uninstall_ipk() {
+    char cmd[256];
+    char package[128];
+    char buffer[128];
+    strcpy(cmd,"/usr/bin/opkg search \"*");
+    strcat(cmd, basename(package_name[link_index]));
+    strcat(cmd,"\" | cut -f1 -d' '");
+    FILE *fp = popen(cmd,"r");
+    if (fp == NULL) {
+        perror("popen failed");
+        return;
+    }
+    if (fgets(buffer, sizeof(buffer), fp) != NULL) {
+        strcpy(package, buffer);
+    }
+    if(package[0] == '\0') {
+        printf("Package not found!");
+        is_open_install = 0;
+        return;
+    }
+    pclose(fp);
+    system("mount -oremount,rw /");
+    strcpy(cmd,"/usr/bin/opkg remove ");
+    strcat(cmd,package);
+    fp = popen(cmd,"r");
+    if (fp == NULL) {
+        perror("popen failed");
+        return;
+    }
+    while (fgets(buffer, sizeof(buffer), fp) != NULL) {
+        buffer[strcspn(buffer, "\n")] = '\0';
+        install_info[current_line] = strdup(buffer);
+        current_line++;
+        update_video();
+    }
+    pclose(fp);
+    system("mount -oremount,ro /");
+    install_done = 1;
 }
 
 void load_install_list() {

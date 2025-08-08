@@ -14,7 +14,6 @@ const char *setting_title[64] = {
     "Volume",
     "Transparent",
     "Change buttons",
-   
 };
 
 char *list_link[64] = {NULL};
@@ -232,6 +231,9 @@ void draw_menu() {
         SDL_FillRect(layout, NULL, SDL_MapRGB(layout->format,0,0,0));
         for(u8 i = 0; i < current_line;i++)
             draw_string(install_info[i],layout,20,20 + i*20,255,255,255);
+
+        if(install_done)
+            draw_string("Process done, Press B to exit.",layout,20,20 + (current_line)*20,255,255,255);
     }
 
     SDL_BlitSurface(battery_state, NULL, layout,[](){

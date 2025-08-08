@@ -194,15 +194,19 @@ void handle_input() {
                     }
                 }
                 if (event.key.keysym.sym == BTN_B) {
-                    if(is_open_link == 1 && is_open_rom == 0 ) {
+                    if(is_open_install == 1) {
+                        is_open_install = 0;
+                        clear_install_info();
+                        clear_list_app();
+                        load_list_app(section_index);
+                        if(max_link == 0 && section_index != max_entry - 2)
+                            is_empty_link = 1;
+                    } else if(is_open_link == 1 && is_open_rom == 0 ) {
                         is_open_link = 0;
                         clear_list_app();
                         link_index = 0;
                         if(max_link == 0 && section_index != max_entry - 2)
                             is_empty_link = 0;
-                    } else if(is_open_install == 1) {
-                        is_open_install = 0;
-                        clear_install_info();
                     } else if(is_open_file_list == 1) {
                         is_open_file_list = 0;
                         clear_file_list();
@@ -263,6 +267,12 @@ void handle_input() {
                     if(is_open_setting == 1 && is_open_remap == 1) {
                         save_config();
                         is_open_remap = 0;
+                    }
+                }
+                if (event.key.keysym.sym == BTN_SELECT) {
+                    if(is_open_link == 1) {
+                        is_open_install = 1;
+                        uninstall_ipk();
                     }
                 }
             break;
