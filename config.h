@@ -8,6 +8,12 @@ typedef struct {
     char bg[128];
     char font[256];
     s16 transparent;
+    s16 text_red;
+    s16 text_green;
+    s16 text_blue;
+    s16 sel_red;
+    s16 sel_green;
+    s16 sel_blue;
 } t_config;
 
 extern t_config option;

@@ -14,6 +14,7 @@ s32 rom_index = 0;
 s16 file_list_index = 0;
 s8 setting_index = 0;
 s8 remap_index = 0;
+s8 color_index = 0;
 
 u8 is_open_link = 0;
 u8 is_empty_link = 0;
@@ -25,6 +26,7 @@ u8 is_empty_folder_file = 0;
 u8 is_open_remap = 0;
 u8 is_open_install = 0;
 u8 message_waiting = 0;
+u8 is_open_color_changing = 0;
 
 SDLKey wait_for_key_input() {
     SDL_Event event;
@@ -62,6 +64,10 @@ void handle_input() {
                         file_list_index--;
                         if(file_list_index < 0)
                             file_list_index = max_file_list - 1;
+                    } else if(is_open_setting && is_open_color_changing) {
+                        color_index--;
+                        if(color_index < 0)
+                            color_index = 5;
                     } else if(is_open_setting && is_open_remap) {
                         remap_index--;
                         if(remap_index < 0)
@@ -86,6 +92,10 @@ void handle_input() {
                         file_list_index++;
                         if(file_list_index > max_file_list - 1)
                             file_list_index = 0;
+                    } else if(is_open_setting && is_open_color_changing) {
+                        color_index++;
+                        if(color_index > 5)
+                            color_index = 0;
                     } else if(is_open_setting && is_open_remap) {
                         remap_index++;
                         if(remap_index > 14-1)
@@ -118,6 +128,32 @@ void handle_input() {
                         if (option.transparent < 0) option.transparent = 0;
                         set_transparent();
                         save_config();
+                    } else if(is_open_setting == 1 && is_open_color_changing == 1) {
+                        if(color_index == 0) {
+                            option.text_red-=1;
+                            if(option.text_red < 0)
+                                option.text_red = 255;
+                        } else if(color_index == 1) {
+                            option.text_green-=1;
+                            if(option.text_green < 0)
+                                option.text_green = 255;
+                        } else if(color_index == 2) {
+                            option.text_blue-=1;
+                            if(option.text_blue < 0)
+                                option.text_blue = 255;
+                        } else if(color_index == 3) {
+                            option.sel_red-=1;
+                            if(option.sel_red < 0)
+                                option.sel_red = 255;
+                        } else if(color_index == 4) {
+                            option.sel_green-=1;
+                            if(option.sel_green < 0)
+                                option.sel_green = 255;
+                        } else if(color_index == 255) {
+                            option.sel_blue-=1;
+                            if(option.sel_blue < 0)
+                                option.sel_blue = 255;
+                        }
                     }
                 }
                 if (event.key.keysym.sym == BTN_RIGHT) {
@@ -136,6 +172,32 @@ void handle_input() {
                         if (option.transparent > 255) option.transparent = 255;
                         set_transparent();
                         save_config();
+                    } else if(is_open_setting == 1 && is_open_color_changing == 1) {
+                        if(color_index == 0) {
+                            option.text_red+=1;
+                            if(option.text_red > 255)
+                                option.text_red = 0;
+                        } else if(color_index == 1) {
+                            option.text_green+=1;
+                            if(option.text_green > 255)
+                                option.text_green = 0;
+                        } else if(color_index == 2) {
+                            option.text_blue+=1;
+                            if(option.text_blue > 255)
+                                option.text_blue = 0;
+                        } else if(color_index == 3) {
+                            option.sel_red+=1;
+                            if(option.sel_red > 255)
+                                option.sel_red = 0;
+                        } else if(color_index == 4) {
+                            option.sel_green+=1;
+                            if(option.sel_green > 255)
+                                option.sel_green = 0;
+                        } else if(color_index == 5) {
+                            option.sel_blue+=1;
+                            if(option.sel_blue > 255)
+                                option.sel_blue = 0;
+                        }
                     }
                 }
                 if (event.key.keysym.sym == BTN_A) {
@@ -157,7 +219,7 @@ void handle_input() {
                     } else if(is_open_setting == 1 && setting_index == 2 && is_open_file_list == 1) {
                         set_font();
                         load_font();
-                    } else if(is_open_setting == 1 && setting_index == 6 && is_open_remap == 1) {
+                    } else if(is_open_setting == 1 && setting_index == 7 && is_open_remap == 1) {
                         option.buttons[remap_index] = 0;
                         message_waiting = 1;
                     } else if(is_open_setting == 1 && setting_index == 1) {
@@ -167,6 +229,8 @@ void handle_input() {
                         is_open_file_list = 1;
                         load_font_list();
                     } else if(is_open_setting == 1 && setting_index == 6) {
+                        is_open_color_changing = 1;
+                    } else if(is_open_setting == 1 && setting_index == 7) {
                         is_open_remap = 1;
                     } else if(section_index == max_entry - 2) {
                         is_open_setting = 1;
@@ -214,6 +278,9 @@ void handle_input() {
                         is_open_remap = 0;
                         remap_index = 0;
                         load_config();
+                    } else if(is_open_setting == 1 && is_open_color_changing == 1) {
+                        is_open_color_changing = 0;
+                        init_config();
                     } else if(section_index == max_entry - 2) is_open_setting = 0;
                     else if(is_open_rom == 1 && have_load_folder == 1){
                         is_open_rom = 0;
@@ -227,6 +294,32 @@ void handle_input() {
                     if(is_open_link == 1 && is_open_rom == 0) {
                         link_index-=7;
                         if(link_index < 0) link_index = 0;
+                    } else if(is_open_setting == 1 && is_open_color_changing == 1) {
+                        if(color_index == 0) {
+                            option.text_red-=10;
+                            if(option.text_red < 0)
+                                option.text_red = 255;
+                        } else if(color_index == 1) {
+                            option.text_green-=10;
+                            if(option.text_green < 0)
+                                option.text_green = 255;
+                        } else if(color_index == 2) {
+                            option.text_blue-=10;
+                            if(option.text_blue < 0)
+                                option.text_blue = 255;
+                        } else if(color_index == 3) {
+                            option.sel_red-=10;
+                            if(option.sel_red < 0)
+                                option.sel_red = 255;
+                        } else if(color_index == 4) {
+                            option.sel_green-=10;
+                            if(option.sel_green < 0)
+                                option.sel_green = 255;
+                        } else if(color_index == 255) {
+                            option.sel_blue-=10;
+                            if(option.sel_blue < 0)
+                                option.sel_blue = 255;
+                        }
                     } else if(is_open_file_list) {
                         file_list_index-=9;
                         if(file_list_index < 0)
@@ -247,6 +340,32 @@ void handle_input() {
                     if(is_open_link == 1 && is_open_rom == 0) {
                         link_index+=7;
                         if(link_index > max_link-1) link_index = max_link-1;
+                    } else if(is_open_setting == 1 && is_open_color_changing == 1) {
+                        if(color_index == 0) {
+                            option.text_red+=10;
+                            if(option.text_red > 255)
+                                option.text_red = 0;
+                        } else if(color_index == 1) {
+                            option.text_green+=10;
+                            if(option.text_green > 255)
+                                option.text_green = 0;
+                        } else if(color_index == 2) {
+                            option.text_blue+=10;
+                            if(option.text_blue > 255)
+                                option.text_blue = 0;
+                        } else if(color_index == 3) {
+                            option.sel_red+=10;
+                            if(option.sel_red > 255)
+                                option.sel_red = 0;
+                        } else if(color_index == 4) {
+                            option.sel_green+=10;
+                            if(option.sel_green > 255)
+                                option.sel_green = 0;
+                        } else if(color_index == 5) {
+                            option.sel_blue+=10;
+                            if(option.sel_blue > 255)
+                                option.sel_blue = 0;
+                        }
                     } else if(is_open_file_list) {
                         file_list_index+=9;
                         if(file_list_index > max_file_list - 1)
@@ -267,7 +386,10 @@ void handle_input() {
                     if(is_open_setting == 1 && is_open_remap == 1) {
                         save_config();
                         is_open_remap = 0;
+                    } else if (is_open_setting && is_open_color_changing == 1) {
+                        save_config();
                     }
+                    
                 }
                 if (event.key.keysym.sym == BTN_SELECT) {
                     if(is_open_link == 1) {

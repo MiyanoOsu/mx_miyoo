@@ -24,6 +24,7 @@ extern s32 rom_index;
 extern s8 setting_index;
 extern s16 file_list_index;
 extern s8 remap_index;
+extern s8 color_index; 
 
 extern u8 is_open_link;
 extern u8 is_empty_link;
@@ -36,6 +37,7 @@ extern u8 have_load_folder;
 extern u8 is_open_remap;
 extern u8 is_open_install;
 extern u8 message_waiting;
+extern u8 is_open_color_changing;
 
 void handle_input();
 

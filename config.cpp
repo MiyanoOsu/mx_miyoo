@@ -54,6 +54,12 @@ void load_config() {
         load_default_font();
         strcpy(option.font, font_path);
         option.transparent = 190;
+        option.text_red = 255;
+        option.text_green = 255;
+        option.text_blue = 255;
+        option.sel_red = 0;
+        option.sel_green = 255;
+        option.sel_blue = 255;
         save_config();
     }
 }
