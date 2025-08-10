@@ -292,6 +292,12 @@ void handle_input() {
                             is_empty_rom_folder = 0;
                     }
                 }
+                if (event.key.keysym.sym == BTN_X) {
+                    if(is_open_link == 1) {
+                        is_open_install = 1;
+                        uninstall_ipk();
+                    }
+                }
                 if (event.key.keysym.sym == BTN_L) {
                     if(is_open_link == 1 && is_open_rom == 0) {
                         link_index-=7;
@@ -392,12 +398,6 @@ void handle_input() {
                         save_config();
                     }
                     
-                }
-                if (event.key.keysym.sym == BTN_SELECT) {
-                    if(is_open_link == 1) {
-                        is_open_install = 1;
-                        uninstall_ipk();
-                    }
                 }
             break;
         }
