@@ -12,6 +12,7 @@ int main() {
     init_font();
     init_video();
     load_section();
+    set_CPU(720);
     while(!done) {
         handle_input();
         load_battery();

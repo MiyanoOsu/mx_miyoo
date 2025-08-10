@@ -471,3 +471,23 @@ void set_volume_value(u8 val) {
 		close(snd);
 	}
 }
+
+#include <sys/mman.h>
+#include <bitset>
+
+void set_CPU(u32 mhz) {
+    volatile u8 memdev = open("/dev/mem", O_RDWR);
+    if (memdev > 0) {
+        u32 *mem = (u32*)mmap(0, 0x1000, PROT_READ | PROT_WRITE, MAP_SHARED, memdev, 0x01c20000);
+        if (mem == MAP_FAILED) {
+            printf("Could not mmap hardware registers!");
+            return;
+        } else {
+            mem[0] = (1 << 31) | ((720 << 18) | (29 << 8) | (0 << 4) & 0x0003ffff);
+        }
+    munmap(mem, 0x1000);
+    } else {
+        printf("Could not open /dev/mem");
+    }
+    close(memdev);
+}
