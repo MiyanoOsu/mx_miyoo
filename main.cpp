@@ -12,7 +12,9 @@ int main() {
     init_font();
     init_video();
     load_section();
+#ifdef MIYOO
     set_CPU(720);
+#endif
     while(!done) {
         handle_input();
         load_battery();

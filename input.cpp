@@ -203,7 +203,9 @@ void handle_input() {
                 if (event.key.keysym.sym == BTN_A) {
                     if(section_index == max_entry-1) {
                         done = 1;
-                        system("sync;poweroff"); //uncomment to make devices turn off when press exitss
+#ifdef MIYOO
+                        system("sync;poweroff");
+#endif
                     } else if(is_open_setting == 1 && setting_index == 0 && is_open_file_list == 1 && is_open_install == 0) {
                         is_open_install = 1;
                         install_ipk();

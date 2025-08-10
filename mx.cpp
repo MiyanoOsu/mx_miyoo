@@ -485,7 +485,7 @@ void set_CPU(u32 mhz) {
         } else {
             mem[0] = (1 << 31) | ((720 << 18) | (29 << 8) | (0 << 4) & 0x0003ffff);
         }
-    munmap(mem, 0x1000);
+        munmap(mem, 0x1000);
     } else {
         printf("Could not open /dev/mem");
     }
