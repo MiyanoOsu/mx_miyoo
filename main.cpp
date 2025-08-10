@@ -13,7 +13,7 @@ int main() {
     init_video();
     load_section();
 #ifdef MIYOO
-    set_CPU(720);
+    set_CPU();
 #endif
     while(!done) {
         handle_input();

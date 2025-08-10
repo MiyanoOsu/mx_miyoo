@@ -475,7 +475,7 @@ void set_volume_value(u8 val) {
 #include <sys/mman.h>
 #include <bitset>
 
-void set_CPU(u32 mhz) {
+void set_CPU() {
     volatile u8 memdev = open("/dev/mem", O_RDWR);
     if (memdev > 0) {
         u32 *mem = (u32*)mmap(0, 0x1000, PROT_READ | PROT_WRITE, MAP_SHARED, memdev, 0x01c20000);
