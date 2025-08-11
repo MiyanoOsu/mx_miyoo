@@ -1,0 +1,4 @@
+title=snes9x4d
+exec=/mnt/emus/snes9x4d/snes9x4d
+selectordir=/mnt/roms/SFC
+selectorelement=179

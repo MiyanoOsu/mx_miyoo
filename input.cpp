@@ -16,6 +16,7 @@ s8 setting_index = 0;
 s8 remap_index = 0;
 s8 color_index = 0;
 
+u8 is_open_section = 0;
 u8 is_open_link = 0;
 u8 is_empty_link = 0;
 u8 is_open_rom = 0;
@@ -27,6 +28,7 @@ u8 is_open_remap = 0;
 u8 is_open_install = 0;
 u8 message_waiting = 0;
 u8 is_open_color_changing = 0;
+u8 is_uninstall = 0;
 
 SDLKey wait_for_key_input() {
     SDL_Event event;
@@ -64,11 +66,11 @@ void handle_input() {
                         file_list_index--;
                         if(file_list_index < 0)
                             file_list_index = max_file_list - 1;
-                    } else if(is_open_setting && is_open_color_changing) {
+                    } else if(is_open_color_changing) {
                         color_index--;
                         if(color_index < 0)
                             color_index = 5;
-                    } else if(is_open_setting && is_open_remap) {
+                    } else if(is_open_remap) {
                         remap_index--;
                         if(remap_index < 0)
                             remap_index = 14-1;
@@ -79,7 +81,7 @@ void handle_input() {
                     } else if(is_open_rom) {
                         rom_index--;
                         if(rom_index < 0) rom_index = max_rom_list-1;
-                    } else {
+                    } else{
                         section_index--;
                         if(section_index < 0) section_index = max_entry-1;
                     }
@@ -92,11 +94,11 @@ void handle_input() {
                         file_list_index++;
                         if(file_list_index > max_file_list - 1)
                             file_list_index = 0;
-                    } else if(is_open_setting && is_open_color_changing) {
+                    } else if(is_open_color_changing) {
                         color_index++;
                         if(color_index > 5)
                             color_index = 0;
-                    } else if(is_open_setting && is_open_remap) {
+                    } else if(is_open_remap) {
                         remap_index++;
                         if(remap_index > 14-1)
                             remap_index = 0;
@@ -107,7 +109,7 @@ void handle_input() {
                     } else if(is_open_rom) {
                         rom_index++;
                         if(rom_index>max_rom_list-1) rom_index = 0;
-                    } else {
+                    } else{
                         section_index++;
                         if(section_index > max_entry-1) section_index = 0;
                     }
@@ -128,7 +130,7 @@ void handle_input() {
                         if (option.transparent < 0) option.transparent = 0;
                         set_transparent();
                         save_config();
-                    } else if(is_open_setting == 1 && is_open_color_changing == 1) {
+                    } else if(is_open_color_changing == 1) {
                         if(color_index == 0) {
                             option.text_red-=1;
                             if(option.text_red < 0)
@@ -172,7 +174,7 @@ void handle_input() {
                         if (option.transparent > 255) option.transparent = 255;
                         set_transparent();
                         save_config();
-                    } else if(is_open_setting == 1 && is_open_color_changing == 1) {
+                    } else if(is_open_color_changing == 1) {
                         if(color_index == 0) {
                             option.text_red+=1;
                             if(option.text_red > 255)
@@ -206,34 +208,45 @@ void handle_input() {
 #ifdef MIYOO
                         system("sync;poweroff");
 #endif
-                    } else if(is_open_setting == 1 && setting_index == 0 && is_open_file_list == 1 && is_open_install == 0) {
+                    } else if(setting_index == 0 && is_open_file_list == 1 && is_open_install == 0) {
                         is_open_install = 1;
+                        is_open_file_list = 0;
                         install_ipk();
                     } else if(is_open_setting == 1 && setting_index == 0) {
                         is_open_file_list = 1;
+                        is_open_section = 0;
+                        is_open_setting = 0;
                         load_install_list();
                         if(max_file_list == 0) {
                             is_empty_folder_file = 1;
                         }
-                    } else if(is_open_setting == 1 && setting_index == 1 && is_open_file_list == 1) {
+                    } else if(setting_index == 1 && is_open_file_list == 1) {
                         set_bg();
                         load_bg();
-                    } else if(is_open_setting == 1 && setting_index == 2 && is_open_file_list == 1) {
+                    } else if(setting_index == 2 && is_open_file_list == 1) {
                         set_font();
                         load_font();
-                    } else if(is_open_setting == 1 && setting_index == 7 && is_open_remap == 1) {
+                    } else if(setting_index == 7 && is_open_remap == 1) {
                         option.buttons[remap_index] = 0;
                         message_waiting = 1;
                     } else if(is_open_setting == 1 && setting_index == 1) {
                         is_open_file_list = 1;
+                        is_open_section = 0;
+                        is_open_setting = 0;
                         load_bg_list();
                     } else if(is_open_setting == 1 && setting_index == 2) {
                         is_open_file_list = 1;
+                        is_open_section = 0;
+                        is_open_setting = 0;
                         load_font_list();
                     } else if(is_open_setting == 1 && setting_index == 6) {
                         is_open_color_changing = 1;
+                        is_open_section = 0;
+                        is_open_setting = 0;
                     } else if(is_open_setting == 1 && setting_index == 7) {
                         is_open_remap = 1;
+                        is_open_section = 0;
+                        is_open_setting = 0;
                     } else if(section_index == max_entry - 2) {
                         is_open_setting = 1;
                     } else if(is_empty_link) {}
@@ -243,8 +256,10 @@ void handle_input() {
                             load_list_app(section_index);
                             if(max_link == 0 && section_index != max_entry - 2)
                                 is_empty_link = 1;
-                        } else if(is_open_link == 1 && is_open_rom == 0 && is_open_install == 0) {
+                        } else if(is_open_rom == 0 && is_open_install == 0) {
                             get_command();
+                            is_open_section = 0;
+                            is_open_link = 0;
                             if(have_load_folder == 1) {
                                 is_open_rom = 1;
                                 load_rom_list();
@@ -262,9 +277,16 @@ void handle_input() {
                 if (event.key.keysym.sym == BTN_B) {
                     if(is_open_install == 1) {
                         is_open_install = 0;
+                        if(is_uninstall == 1) {
+                            is_open_section = 1;
+                            is_open_link = 1;
+                            is_uninstall = 0;
+                            clear_list_app();
+                            load_list_app(section_index);
+                        } else { 
+                            is_open_file_list = 1;
+                        }
                         clear_install_info();
-                        clear_list_app();
-                        load_list_app(section_index);
                         if(max_link == 0 && section_index != max_entry - 2)
                             is_empty_link = 1;
                     } else if(is_open_link == 1 && is_open_rom == 0 ) {
@@ -275,26 +297,38 @@ void handle_input() {
                             is_empty_link = 0;
                     } else if(is_open_file_list == 1) {
                         is_open_file_list = 0;
+                        is_open_section = 1;
+                        is_open_setting = 1;
                         clear_file_list();
-                    } else if(is_open_setting == 1 && is_open_remap == 1) {
+                    } else if(is_open_remap == 1) {
                         is_open_remap = 0;
+                        is_open_section = 1;
+                        is_open_setting = 1;
                         remap_index = 0;
                         load_config();
-                    } else if(is_open_setting == 1 && is_open_color_changing == 1) {
+                    } else if(is_open_color_changing == 1) {
                         is_open_color_changing = 0;
+                        is_open_section = 1;
+                        is_open_setting = 1;
                         init_config();
-                    } else if(section_index == max_entry - 2) is_open_setting = 0;
-                    else if(is_open_rom == 1 && have_load_folder == 1){
+                    } else if(is_open_rom == 1 && have_load_folder == 1){
                         is_open_rom = 0;
+                        is_open_section = 1;
+                        is_open_link = 1;
                         have_load_folder = 0;
                         clear_list_rom();
                         if(max_rom_list == 0)
                             is_empty_rom_folder = 0;
+                    } else if(section_index == max_entry - 2) {
+                        is_open_setting = 0;
                     }
                 }
                 if (event.key.keysym.sym == BTN_X) {
                     if(is_open_link == 1) {
                         is_open_install = 1;
+                        is_uninstall = 1;
+                        is_open_section = 0;
+                        is_open_link = 0;
                         uninstall_ipk();
                     }
                 }

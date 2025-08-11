@@ -1,4 +1,4 @@
-title=picodrive
+title=PicoDrive
 exec=/mnt/emus/picodrive/picodrive
 selectordir=/mnt/roms/SMS_MD_GG
-selectorelement=106
+selectorelement=4

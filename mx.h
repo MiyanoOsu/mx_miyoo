@@ -4,9 +4,7 @@
 extern u8 max_entry;
 extern u8 max_link;
 extern u16 max_rom_list;
-extern u16 max_list_file;
 extern u16 max_file_list;
-
 extern u8 current_line;
 extern u8 install_done;
 
@@ -35,6 +33,6 @@ u8 get_backlight_value();
 void set_backlight_value(u8 val);
 u8 get_volume_value();
 void set_volume_value(u8 val);
-void set_CPU();
+void set_CPU(u8 values);
 
 #endif // _MX_H_

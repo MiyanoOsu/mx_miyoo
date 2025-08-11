@@ -26,6 +26,7 @@ extern s16 file_list_index;
 extern s8 remap_index;
 extern s8 color_index; 
 
+extern u8 is_open_section;
 extern u8 is_open_link;
 extern u8 is_empty_link;
 extern u8 is_open_rom;

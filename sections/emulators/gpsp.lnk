@@ -1,4 +1,4 @@
-title=gpsp
+title=gpSP
 exec=/mnt/emus/gpsp/gpsp
 selectordir=/mnt/roms/GBA
-selectorelement=28
+selectorelement=85

@@ -20,6 +20,5 @@ docker pull miyoocfw/toolchain-shared-uclibc:latest
 # to compile
 docker run --volume ./:/src/ -it miyoocfw/toolchain-shared-uclibc:latest
 cd src
-./configure --disable-gl --enable-fullscreen --host=arm-linux CC=arm-linux-gcc
-make -j $(nproc)
+make -f makefile.miyoo -j $(nproc)
 ~~~

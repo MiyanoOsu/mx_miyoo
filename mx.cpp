@@ -225,6 +225,7 @@ void load_section() {
         free(section_name[i]);
     }
     free(section_name);
+    is_open_section = 1;
 }
 
 void load_list_app(u8 order) {
@@ -475,7 +476,16 @@ void set_volume_value(u8 val) {
 #include <sys/mman.h>
 #include <bitset>
 
-void set_CPU() {
+void set_CPU(u8 values) {
+    u32 oc_table[] {
+    // F1C100S PLL_CPU Control Register.
+    // 24MHz*N*K/(M*P) ; N = (Nf+1)<=32 ; K = (Kf+1)<=4 ; M = (Mf+1)<=4 ; P = (00: /1 | 01: /2 | 10: /4); --> CPU_PLL output must be in 200MHz~2.6GHz range
+    // 27:18 are 10bit non-affecting space thus starting to read "int mhz" value here "(MHz << 18)" up to last 32bit.
+    // ((24 * N * K) << 18) | (Nf << 8) | (Kf << 4) | (Mf << 0) | (Pf << 16),
+    //
+        (408 << 18) | (16 << 8) | (0 << 4),
+        (720 << 18) | (29 << 8) | (0 << 4)
+    };
     volatile u8 memdev = open("/dev/mem", O_RDWR);
     if (memdev > 0) {
         u32 *mem = (u32*)mmap(0, 0x1000, PROT_READ | PROT_WRITE, MAP_SHARED, memdev, 0x01c20000);
@@ -483,7 +493,7 @@ void set_CPU() {
             printf("Could not mmap hardware registers!");
             return;
         } else {
-            mem[0] = (1 << 31) | ((720 << 18) | (29 << 8) | (0 << 4) & 0x0003ffff);
+            mem[0] = (1 << 31) | (oc_table[values] & 0x0003ffff);
         }
         munmap(mem, 0x1000);
     } else {

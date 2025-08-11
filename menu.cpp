@@ -95,15 +95,16 @@ void draw_menu() {
     SDL_Color text = {(u8)option.text_red, (u8)option.text_green, (u8)option.text_blue};
     SDL_Color selection = {(u8)option.sel_red, (u8)option.sel_green, (u8)option.sel_blue};
     SDL_Color warning = {255,255,0};
-    
     //printf("Before draw: R=%d G=%d B=%d\n", text.r, text.g, text.b);
     
-    SDL_FillRect(layout, NULL, SDL_MapRGB(layout->format,0,0,0));
-    for(u8 i = 0; i < max_entry; i++) {
-        if(i == section_index)
-            draw_string(menu_title[i], layout, 30, 35 + i * 20, selection);
-        else
-            draw_string(menu_title[i], layout, 30, 35 + i * 20, text);
+    if(is_open_section) {
+        SDL_FillRect(layout, NULL, SDL_MapRGB(layout->format,0,0,0));
+        for(u8 i = 0; i < max_entry; i++) {
+            if(i == section_index)
+                draw_string(menu_title[i], layout, 30, 35 + i * 20, selection);
+            else
+                draw_string(menu_title[i], layout, 30, 35 + i * 20, text);
+        }
     }
 
     if(is_open_setting) {
