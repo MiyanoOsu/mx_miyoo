@@ -307,9 +307,17 @@ void draw_menu() {
         SDL_FillRect(layout, NULL, SDL_MapRGB(layout->format,0,0,0));
         for(u8 i = 0; i < current_line;i++)
             draw_string(install_info[i],layout,20,20 + i*20, text);
-
-        if(install_done)
+        if(done_massage)
             draw_string("Process done, Press B to exit.",layout,20,20 + (current_line)*20, text);
+    }
+
+    if(done_massage) {
+        if(is_open_remap) {
+            draw_string("Save keymap successfull!", layout, 35, 0, warning);
+        }
+        else if(is_open_color_changing) {
+            draw_string("Save colors successfull!", layout, 35, 0, warning);
+        }
     }
 
     SDL_BlitSurface(battery_state, NULL, layout,[](){

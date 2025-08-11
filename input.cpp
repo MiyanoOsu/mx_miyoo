@@ -36,6 +36,7 @@ SDLKey wait_for_key_input() {
         while (SDL_PollEvent(&event)) {
             if (event.type == SDL_KEYDOWN) {
                 message_waiting = 0;
+                done_massage = 0;
                 return event.key.keysym.sym;
             }
             if (event.type == SDL_QUIT) {
@@ -52,6 +53,10 @@ void handle_input() {
 
         if(message_waiting)
             option.buttons[remap_index] = wait_for_key_input();
+
+        if(done_massage == 1 && is_open_install == 0) {
+            wait_for_key_input();
+        }
 
         switch(event.type) {
             case SDL_QUIT:
@@ -336,7 +341,7 @@ void handle_input() {
                     if(is_open_link == 1 && is_open_rom == 0) {
                         link_index-=7;
                         if(link_index < 0) link_index = 0;
-                    } else if(is_open_setting == 1 && is_open_color_changing == 1) {
+                    } else if(is_open_color_changing == 1) {
                         if(color_index == 0) {
                             option.text_red-=10;
                             if(option.text_red < 0)
@@ -382,7 +387,7 @@ void handle_input() {
                     if(is_open_link == 1 && is_open_rom == 0) {
                         link_index+=7;
                         if(link_index > max_link-1) link_index = max_link-1;
-                    } else if(is_open_setting == 1 && is_open_color_changing == 1) {
+                    } else if(is_open_color_changing == 1) {
                         if(color_index == 0) {
                             option.text_red+=10;
                             if(option.text_red > 255)
@@ -425,11 +430,13 @@ void handle_input() {
                     }
                 }
                 if (event.key.keysym.sym == BTN_START) {
-                    if(is_open_setting == 1 && is_open_remap == 1) {
+                    if(is_open_remap == 1) {
                         save_config();
-                        is_open_remap = 0;
-                    } else if (is_open_setting && is_open_color_changing == 1) {
+                        done_massage = 1;
+                        
+                    } else if (is_open_color_changing == 1) {
                         save_config();
+                        done_massage = 1;
                     }
                     
                 }

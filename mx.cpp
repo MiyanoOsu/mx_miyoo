@@ -22,7 +22,7 @@ u8 have_load_folder = 0;
 u16 max_file_list = 0;
 
 u8 current_line = 0;
-u8 install_done = 0;
+u8 done_massage = 0;
 
 char command[512];
 char dir[256];
@@ -281,7 +281,7 @@ void clear_install_info() {
         install_info[i] = NULL;
     }
     current_line = 0;
-    install_done = 0;
+    done_massage = 0;
 }
 
 void install_ipk() {
@@ -307,7 +307,7 @@ void install_ipk() {
     pclose(fp);
     if (mount("/", "/", NULL, MS_REMOUNT | MS_RDONLY, NULL) != 0)
         perror("remount as ro failed");
-    install_done = 1;
+    done_massage = 1;
 }
 
 void uninstall_ipk() {
@@ -354,7 +354,7 @@ void uninstall_ipk() {
     if (mount("/", "/", NULL, MS_REMOUNT | MS_RDONLY, NULL) != 0)
         perror("remount as ro failed");
 
-    install_done = 1;
+    done_massage = 1;
 }
 
 void load_install_list() {

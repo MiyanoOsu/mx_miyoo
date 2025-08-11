@@ -6,7 +6,7 @@ extern u8 max_link;
 extern u16 max_rom_list;
 extern u16 max_file_list;
 extern u8 current_line;
-extern u8 install_done;
+extern u8 done_massage;
 
 void add_section(const char *name);
 void load_section();
