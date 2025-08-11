@@ -251,7 +251,7 @@ void handle_input() {
                         is_open_setting = 1;
                     } else if(is_empty_link) {}
                     else {
-                        if(is_open_link == 0) {
+                        if(is_open_link == 0 && is_open_rom == 0) {
                             is_open_link = 1;
                             load_list_app(section_index);
                             if(max_link == 0 && section_index != max_entry - 2)
