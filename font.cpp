@@ -20,12 +20,31 @@ void init_font() {
     load_font();
 }
 
+SDL_Rect dirty_rects[MAX_DIRTY];
+u8 dirty_count = 0;
+
 void draw_string(const char *string, SDL_Surface *surface, s16 x, s16 y, SDL_Color font_color) {
-    SDL_Rect dst = {x,y,0,0};
+    int w = 0, h = 0;
+    TTF_SizeText(font, string, &w, &h);
+    SDL_Rect dst = {x,y,(u16)w,(u16)h};
     // printf("Font color: R=%d, G=%d, B=%d\n",
     //    font_color.r,
     //    font_color.g,
     //    font_color.b);
+    if (dirty_count == 0) {
+        dirty_rects[dirty_count].x = 301;
+        dirty_rects[dirty_count].y = 2;
+        dirty_rects[dirty_count].w = 16;
+        dirty_rects[dirty_count].h = 16;
+        dirty_count++;
+    }
+    if (dirty_count < MAX_DIRTY) {
+        dirty_rects[dirty_count].x = x;
+        dirty_rects[dirty_count].y = y;
+        dirty_rects[dirty_count].w = w;
+        dirty_rects[dirty_count].h = h;
+        dirty_count++;
+    }
     SDL_Surface *text_surface = TTF_RenderUTF8_Blended(font, string, font_color);
     SDL_BlitSurface(text_surface, NULL, surface, &dst);
     SDL_FreeSurface(text_surface);

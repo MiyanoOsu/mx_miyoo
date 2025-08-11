@@ -196,10 +196,9 @@ void draw_menu() {
     if(is_open_remap) {
         char key_text[30];
         SDL_FillRect(layout, NULL, SDL_MapRGB(layout->format,0,0,0));
-        s8 end = remap_offset + MAX_VISIBLE_LIST - 1;
         if(remap_index < remap_offset)
             remap_offset = remap_index;
-        if (remap_index >= end)
+        if (remap_index >= remap_offset + MAX_VISIBLE_LIST - 1)
             remap_offset = remap_index - MAX_VISIBLE_LIST + 2;
         
         if(remap_offset + MAX_VISIBLE_LIST - 1 < 14)
@@ -207,7 +206,7 @@ void draw_menu() {
         if(offset > 0)
             draw_string("↑", layout, 15, 50, selection);
 
-        for(u8 i = remap_offset; i < end; i++) {
+        for(u8 i = remap_offset; i < remap_offset + MAX_VISIBLE_LIST - 1; i++) {
             snprintf(key_text,sizeof(key_text),remap[i],return_text_button(option.buttons[i]));
             if(i == remap_index)
                 draw_string(key_text, layout , 35, 30 + (i - remap_offset) * 20, selection);
@@ -224,10 +223,9 @@ void draw_menu() {
         if(is_empty_link)
             draw_string("<empty>",layout, 160, 35, text);
         else {
-            s16 end = link_offset + MAX_VISIBLE_LIST - 2;
             if(link_index < link_offset)
                 link_offset = link_index;
-            if (link_index >= end)
+            if (link_index >= link_offset + MAX_VISIBLE_LIST - 2)
                 link_offset = link_index - MAX_VISIBLE_LIST + 2 + 1;
             
             if(link_offset + MAX_VISIBLE_LIST - 2 < max_link)
@@ -235,14 +233,19 @@ void draw_menu() {
             if(link_offset > 0)
                 draw_string("↑", layout, 15, 50, selection);
             if(max_link < MAX_VISIBLE_LIST - 2) {
-                link_offset = 0;
-                end = max_link;
-            }
-            for(u8 i = link_offset; i < end; i++) {
-                if(i == link_index)
-                    draw_string(list_link[i], layout, 160, 35 + (i - link_offset) * 20, selection);
-                else
-                    draw_string(list_link[i], layout, 160, 35 + (i - link_offset) * 20, text);
+                for(u8 i = 0; i < max_link; i++) {
+                    if(i == link_index)
+                        draw_string(list_link[i], layout, 160, 35 + (i - link_offset) * 20, selection);
+                    else
+                        draw_string(list_link[i], layout, 160, 35 + (i - link_offset) * 20, text);
+                }
+            } else {
+                for(u8 i = link_offset; i < link_offset + MAX_VISIBLE_LIST - 2; i++) {
+                    if(i == link_index)
+                        draw_string(list_link[i], layout, 160, 35 + (i - link_offset) * 20, selection);
+                    else
+                        draw_string(list_link[i], layout, 160, 35 + (i - link_offset) * 20, text);
+                }
             }
         }
     }
@@ -252,10 +255,9 @@ void draw_menu() {
         if(is_empty_rom_folder)
             draw_string("<empty>",layout, 60, 35, text);
         else {
-            s32 end = offset + MAX_VISIBLE_LIST;
             if(rom_index < offset)
                 offset = rom_index;
-            if (rom_index >= end)
+            if (rom_index >= offset + MAX_VISIBLE_LIST)
                 offset = rom_index - MAX_VISIBLE_LIST + 1;
             
             if(offset + MAX_VISIBLE_LIST < max_rom_list)
@@ -263,14 +265,19 @@ void draw_menu() {
             if(offset > 0)
                 draw_string("↑", layout, 15, 50, selection);
             if(max_rom_list < MAX_VISIBLE_LIST) {
-                offset = 0;
-                end = max_rom_list;
-            }
-            for(u16 i = offset; i < end; i++) {
-                if(i == rom_index)
-                    draw_string(list_rom[i], layout, 35, 20 + (i - offset) * 20, selection);
-                else
-                    draw_string(list_rom[i], layout, 35, 20 + (i - offset) * 20, text);
+                for(u16 i = 0; i < max_rom_list; i++) {
+                    if(i == rom_index)
+                        draw_string(list_rom[i], layout, 35, 20 + (i - offset) * 20, selection);
+                    else
+                        draw_string(list_rom[i], layout, 35, 20 + (i - offset) * 20, text);
+                }
+            } else {
+                for(u16 i = offset; i < offset + MAX_VISIBLE_LIST; i++) {
+                    if(i == rom_index)
+                        draw_string(list_rom[i], layout, 35, 20 + (i - offset) * 20, selection);
+                    else
+                        draw_string(list_rom[i], layout, 35, 20 + (i - offset) * 20, text);
+                }
             }
         }
     }
@@ -280,10 +287,9 @@ void draw_menu() {
         if(is_empty_folder_file)
             draw_string("<empty>",layout, 60, 35, text);
         else {
-            s16 end = file_list_offset + MAX_VISIBLE_LIST;
             if(file_list_index < file_list_offset)
                 file_list_offset = file_list_index;
-            if (file_list_index >= end)
+            if (file_list_index >= file_list_offset + MAX_VISIBLE_LIST)
                 file_list_offset = file_list_index - MAX_VISIBLE_LIST + 1;
             
             if(file_list_offset + MAX_VISIBLE_LIST < max_file_list)
@@ -291,14 +297,19 @@ void draw_menu() {
             if(file_list_offset > 0)
                 draw_string("↑", layout, 15, 50, selection);
             if(max_file_list < MAX_VISIBLE_LIST) {
-                file_list_offset = 0;
-                end = max_file_list;
-            }
-            for(u8 i = file_list_offset; i < end; i++) {
-                if(i == file_list_index)
-                    draw_string(list_file[i], layout, 35, 20 + (i - file_list_offset) * 20, selection);
-                else
-                    draw_string(list_file[i], layout, 35, 20 + (i - file_list_offset) * 20, text);
+                for(u8 i = 0; i < max_file_list; i++) {
+                    if(i == file_list_index)
+                        draw_string(list_file[i], layout, 35, 20 + (i - file_list_offset) * 20, selection);
+                    else
+                        draw_string(list_file[i], layout, 35, 20 + (i - file_list_offset) * 20, text);
+                }
+            } else {
+                for(u8 i = file_list_offset; i < file_list_offset + MAX_VISIBLE_LIST; i++) {
+                    if(i == file_list_index)
+                        draw_string(list_file[i], layout, 35, 20 + (i - file_list_offset) * 20, selection);
+                    else
+                        draw_string(list_file[i], layout, 35, 20 + (i - file_list_offset) * 20, text);
+                }
             }
         }
     }

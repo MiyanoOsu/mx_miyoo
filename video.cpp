@@ -2,6 +2,7 @@
 #include "menu.h"
 #include "config.h"
 #include "mx.h"
+#include "font.h"
 #include <SDL/SDL.h>
 #include <SDL/SDL_image.h>
 
@@ -85,13 +86,13 @@ void init_video() {
         return;
     }
     load_bg();
-    layout = SDL_CreateRGBSurface(SDL_SWSURFACE,320,240,16,0,0,0,255);
+    layout = SDL_CreateRGBSurface(SDL_SWSURFACE,320,240,16,0,0,0,0);
     if(layout == NULL) {
         printf("Could not create surface: %s\n",SDL_GetError());
         return;
     }
 
-    layout_bg = SDL_CreateRGBSurface(SDL_SWSURFACE,320,240,16,0,0,0,255);
+    layout_bg = SDL_CreateRGBSurface(SDL_SWSURFACE,320,240,16,0,0,0,0);
     if(layout_bg == NULL) {
         printf("Could not create surface: %s\n",SDL_GetError());
         return;
@@ -100,12 +101,20 @@ void init_video() {
     set_transparent();
 }
 
+u8 update_bg = 1;
+
 void update_video() {
-    draw_menu();
     SDL_BlitSurface(background,NULL,screen,NULL);
     SDL_BlitSurface(layout_bg,NULL,screen,NULL);
+    draw_menu();
     SDL_BlitSurface(layout,NULL,screen,NULL);
-    SDL_Flip(screen);
+    if(update_bg) {
+        SDL_Flip(screen);
+        update_bg = 0;
+    } else if (dirty_count > 0) {
+        SDL_UpdateRects(screen, dirty_count, dirty_rects);
+        dirty_count = 0; // reset for the next frame
+    }
 }
 
 void close_video() {

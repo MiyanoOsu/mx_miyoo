@@ -37,6 +37,7 @@ SDLKey wait_for_key_input() {
             if (event.type == SDL_KEYDOWN) {
                 message_waiting = 0;
                 done_massage = 0;
+                update_bg = 1;
                 return event.key.keysym.sym;
             }
             if (event.type == SDL_QUIT) {
@@ -68,6 +69,7 @@ void handle_input() {
                         link_index--;
                         if(link_index < 0) link_index = max_link-1;
                     } else if(is_open_file_list) {
+                        update_bg = 1;
                         file_list_index--;
                         if(file_list_index < 0)
                             file_list_index = max_file_list - 1;
@@ -76,6 +78,7 @@ void handle_input() {
                         if(color_index < 0)
                             color_index = 5;
                     } else if(is_open_remap) {
+                        update_bg = 1;
                         remap_index--;
                         if(remap_index < 0)
                             remap_index = 14-1;
@@ -84,6 +87,7 @@ void handle_input() {
                         if(setting_index < 0)
                             setting_index = MAX_SETTING_LIST -1;
                     } else if(is_open_rom) {
+                        update_bg = 1;
                         rom_index--;
                         if(rom_index < 0) rom_index = max_rom_list-1;
                     } else{
@@ -96,6 +100,7 @@ void handle_input() {
                         link_index++;
                         if(link_index > max_link-1) link_index = 0;
                     } else if(is_open_file_list) {
+                        update_bg = 1;
                         file_list_index++;
                         if(file_list_index > max_file_list - 1)
                             file_list_index = 0;
@@ -104,6 +109,7 @@ void handle_input() {
                         if(color_index > 5)
                             color_index = 0;
                     } else if(is_open_remap) {
+                        update_bg = 1;
                         remap_index++;
                         if(remap_index > 14-1)
                             remap_index = 0;
@@ -112,6 +118,7 @@ void handle_input() {
                         if(setting_index > MAX_SETTING_LIST - 1)
                             setting_index = 0;
                     } else if(is_open_rom) {
+                        update_bg = 1;
                         rom_index++;
                         if(rom_index>max_rom_list-1) rom_index = 0;
                     } else{
@@ -131,11 +138,13 @@ void handle_input() {
                         if (val < 1) val = 1;
                         set_volume_value(val);
                     } else if(is_open_setting == 1 && setting_index == 5) {
+                        update_bg = 1;
                         option.transparent-=4;
                         if (option.transparent < 0) option.transparent = 0;
                         set_transparent();
                         save_config();
                     } else if(is_open_color_changing == 1) {
+                        update_bg = 1;
                         if(color_index == 0) {
                             option.text_red-=1;
                             if(option.text_red < 0)
@@ -175,11 +184,13 @@ void handle_input() {
                         if (val > 9) val = 9;
                         set_volume_value(val);
                     } else if(is_open_setting == 1 && setting_index == 5) {
+                        update_bg = 1;
                         option.transparent+=4;
                         if (option.transparent > 255) option.transparent = 255;
                         set_transparent();
                         save_config();
                     } else if(is_open_color_changing == 1) {
+                        update_bg = 1;
                         if(color_index == 0) {
                             option.text_red+=1;
                             if(option.text_red > 255)
@@ -214,10 +225,12 @@ void handle_input() {
                         system("sync;poweroff");
 #endif
                     } else if(setting_index == 0 && is_open_file_list == 1 && is_open_install == 0) {
+                        update_bg = 1;
                         is_open_install = 1;
                         is_open_file_list = 0;
                         install_ipk();
                     } else if(is_open_setting == 1 && setting_index == 0) {
+                        update_bg = 1;
                         is_open_file_list = 1;
                         is_open_section = 0;
                         is_open_setting = 0;
@@ -226,29 +239,36 @@ void handle_input() {
                             is_empty_folder_file = 1;
                         }
                     } else if(setting_index == 1 && is_open_file_list == 1) {
+                        update_bg = 1;
                         set_bg();
                         load_bg();
                     } else if(setting_index == 2 && is_open_file_list == 1) {
+                        update_bg = 1;
                         set_font();
                         load_font();
                     } else if(setting_index == 7 && is_open_remap == 1) {
+                        update_bg = 1;
                         option.buttons[remap_index] = 0;
                         message_waiting = 1;
                     } else if(is_open_setting == 1 && setting_index == 1) {
+                        update_bg = 1;
                         is_open_file_list = 1;
                         is_open_section = 0;
                         is_open_setting = 0;
                         load_bg_list();
                     } else if(is_open_setting == 1 && setting_index == 2) {
+                        update_bg = 1;
                         is_open_file_list = 1;
                         is_open_section = 0;
                         is_open_setting = 0;
                         load_font_list();
                     } else if(is_open_setting == 1 && setting_index == 6) {
+                        update_bg = 1;
                         is_open_color_changing = 1;
                         is_open_section = 0;
                         is_open_setting = 0;
                     } else if(is_open_setting == 1 && setting_index == 7) {
+                        update_bg = 1;
                         is_open_remap = 1;
                         is_open_section = 0;
                         is_open_setting = 0;
@@ -266,6 +286,7 @@ void handle_input() {
                             is_open_section = 0;
                             is_open_link = 0;
                             if(have_load_folder == 1) {
+                                update_bg = 1;
                                 is_open_rom = 1;
                                 load_rom_list();
                                 if (max_rom_list == 0)
@@ -280,6 +301,7 @@ void handle_input() {
                     }
                 }
                 if (event.key.keysym.sym == BTN_B) {
+                    update_bg = 1;
                     if(is_open_install == 1) {
                         is_open_install = 0;
                         if(is_uninstall == 1) {
@@ -330,6 +352,7 @@ void handle_input() {
                 }
                 if (event.key.keysym.sym == BTN_X) {
                     if(is_open_link == 1) {
+                        update_bg = 1;
                         is_open_install = 1;
                         is_uninstall = 1;
                         is_open_section = 0;
@@ -342,6 +365,7 @@ void handle_input() {
                         link_index-=7;
                         if(link_index < 0) link_index = 0;
                     } else if(is_open_color_changing == 1) {
+                        update_bg = 1;
                         if(color_index == 0) {
                             option.text_red-=10;
                             if(option.text_red < 0)
@@ -368,6 +392,7 @@ void handle_input() {
                                 option.sel_blue = 255;
                         }
                     } else if(is_open_file_list) {
+                        update_bg = 1;
                         file_list_index-=9;
                         if(file_list_index < 0)
                             file_list_index = 0;
@@ -376,6 +401,7 @@ void handle_input() {
                         if(setting_index < 0)
                             setting_index = 0;
                     } else if(is_open_rom) {
+                        update_bg = 1;
                         rom_index-=9;
                         if(rom_index < 0) rom_index = 0;
                     } else {
@@ -388,6 +414,7 @@ void handle_input() {
                         link_index+=7;
                         if(link_index > max_link-1) link_index = max_link-1;
                     } else if(is_open_color_changing == 1) {
+                        update_bg = 1;
                         if(color_index == 0) {
                             option.text_red+=10;
                             if(option.text_red > 255)
@@ -414,6 +441,7 @@ void handle_input() {
                                 option.sel_blue = 0;
                         }
                     } else if(is_open_file_list) {
+                        update_bg = 1;
                         file_list_index+=9;
                         if(file_list_index > max_file_list - 1)
                             file_list_index = max_file_list - 1;
@@ -422,6 +450,7 @@ void handle_input() {
                         if(setting_index > MAX_SETTING_LIST - 1)
                             setting_index = MAX_SETTING_LIST - 1;
                     } else if(is_open_rom) {
+                        update_bg = 1;
                         rom_index+=9;
                         if(rom_index>max_rom_list-1) rom_index = max_rom_list - 1;
                     } else {
@@ -438,7 +467,6 @@ void handle_input() {
                         save_config();
                         done_massage = 1;
                     }
-                    
                 }
             break;
         }
