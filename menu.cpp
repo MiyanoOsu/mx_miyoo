@@ -252,32 +252,28 @@ void draw_menu() {
 
     if(is_open_rom) {
         SDL_FillRect(layout, NULL, SDL_MapRGB(layout->format,0,0,0));
-        if(is_empty_rom_folder)
-            draw_string("<empty>",layout, 60, 35, text);
-        else {
-            if(rom_index < offset)
-                offset = rom_index;
-            if (rom_index >= offset + MAX_VISIBLE_LIST)
-                offset = rom_index - MAX_VISIBLE_LIST + 1;
-            
-            if(offset + MAX_VISIBLE_LIST < max_rom_list)
-                draw_string("↓", layout, 5, 50, selection);
-            if(offset > 0)
-                draw_string("↑", layout, 15, 50, selection);
-            if(max_rom_list < MAX_VISIBLE_LIST) {
-                for(u16 i = 0; i < max_rom_list; i++) {
-                    if(i == rom_index)
-                        draw_string(list_rom[i], layout, 35, 20 + (i - offset) * 20, selection);
-                    else
-                        draw_string(list_rom[i], layout, 35, 20 + (i - offset) * 20, text);
-                }
-            } else {
-                for(u16 i = offset; i < offset + MAX_VISIBLE_LIST; i++) {
-                    if(i == rom_index)
-                        draw_string(list_rom[i], layout, 35, 20 + (i - offset) * 20, selection);
-                    else
-                        draw_string(list_rom[i], layout, 35, 20 + (i - offset) * 20, text);
-                }
+        if(rom_index < offset)
+            offset = rom_index;
+        if (rom_index >= offset + MAX_VISIBLE_LIST)
+            offset = rom_index - MAX_VISIBLE_LIST + 1;
+        
+        if(offset + MAX_VISIBLE_LIST < max_rom_list)
+            draw_string("↓", layout, 5, 50, selection);
+        if(offset > 0)
+            draw_string("↑", layout, 15, 50, selection);
+        if(max_rom_list < MAX_VISIBLE_LIST) {
+            for(u16 i = 0; i < max_rom_list; i++) {
+                if(i == rom_index)
+                    draw_string(list_rom[i], layout, 35, 20 + (i - offset) * 20, selection);
+                else
+                    draw_string(list_rom[i], layout, 35, 20 + (i - offset) * 20, text);
+            }
+        } else {
+            for(u16 i = offset; i < offset + MAX_VISIBLE_LIST; i++) {
+                if(i == rom_index)
+                    draw_string(list_rom[i], layout, 35, 20 + (i - offset) * 20, selection);
+                else
+                    draw_string(list_rom[i], layout, 35, 20 + (i - offset) * 20, text);
             }
         }
     }

@@ -13,7 +13,7 @@ void load_section();
 void load_list_app(u8 order);
 void clear_list_app();
 void load_rom_list();
-void clear_list_rom();
+void clear_rom_list();
 void get_command();
 void run_command();
 void clear_file_list();

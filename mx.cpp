@@ -21,6 +21,8 @@ u16 max_rom_list = 0;
 u8 have_load_folder = 0;
 u16 max_file_list = 0;
 
+u8 is_default_folder = 0;
+
 u8 current_line = 0;
 u8 done_massage = 0;
 
@@ -214,9 +216,11 @@ void get_command() {
         if(strncmp(line,"selectordir=", 12) == 0) {
             struct stat st;
             if (stat(line + 12, &st) == 0 && S_ISDIR(st.st_mode)) {
-                strcat(command,"\"");
-                strcat(command,line + 12);
                 strcpy(dir,line + 12);
+                is_default_folder = 0;
+            } else {
+                strcpy(dir,getenv("HOME"));
+                is_default_folder = 1;
             }
             have_load_folder = 1;
         }
@@ -269,7 +273,7 @@ void load_rom_list() {
     max_rom_list = list_count;
 }
 
-void clear_list_rom() {
+void clear_rom_list() {
     for (int i = 0; i < max_rom_list; i++) {
         free(list_rom[i]);
         list_rom[i] = NULL;
@@ -419,20 +423,69 @@ void set_font() {
     save_config();
 }
 
-void run_command() {
-    if (have_load_folder) {
-        strcat(command,"/");
-        strcat(command,list_rom[rom_index]);
-        strcat(command,"\"");
+void save_rom_path() {
+    char path[256];
+    snprintf(path,sizeof(path),"sections/%s/%s",menu_title[section_index],list_name[link_index]);
+    FILE* file = fopen(path,"r");
+    if(!file) {
+        printf("path not found");
     }
-    chdir(binary_path);
-    close_font();
-    close_video();
-    clear_list_rom();
-    clear_list_app();
-    clear_file_list();
-    done = 1;
-    system(command);
+    char lines[256][256];
+    int count = 0;
+    while(fgets(lines[count],sizeof(lines[count]),file)) {
+        if(strncmp(lines[count],"selectordir=", 12) == 0) {
+            snprintf(lines[count],sizeof(lines[count]),"selectordir=%s\n",dir);
+        }
+        count++;
+    }
+    fclose(file);
+    file = fopen(path,"w");
+    for (int i = 0; i < count; i++) {
+        fprintf(file,lines[i]);
+    }
+    fclose(file);
+}
+
+void run_command() {
+    load_folder:
+    struct stat st;
+    if(have_load_folder && is_default_folder == 1) {
+        char path[256];
+        snprintf(path, sizeof(path), "%s/%s", dir, list_rom[rom_index]);
+        if (stat(path, &st) == 0 && S_ISDIR(st.st_mode)) {
+            strcat(dir, "/");
+            strcat(dir, list_rom[rom_index]);
+            realpath(dir, dir);
+            update_bg = 1;
+            clear_rom_list();
+            load_rom_list();
+        } else {
+            is_default_folder = 0;
+            save_rom_path();
+        }
+    }
+    if(have_load_folder && is_default_folder == 0) {
+        if (stat(list_rom[rom_index], &st) == 0 && S_ISDIR(st.st_mode)) {
+            is_default_folder = 1;
+            goto load_folder;
+        }
+        strcat(command, "\"");
+        strcat(command, dir);
+        strcat(command, "/");
+        strcat(command, list_rom[rom_index]);
+        strcat(command, "\"");
+        have_load_folder = 0;
+    }
+    if(have_load_folder == 0) {
+        chdir(binary_path);
+        close_font();
+        close_video();
+        clear_rom_list();
+        clear_list_app();
+        clear_file_list();
+        done = 1;
+        system(command);
+    }
 }
 
 u8 get_battery_status() {
