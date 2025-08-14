@@ -33,12 +33,12 @@ char binary_path [256];
 char *package_name[256] = {NULL};
 
 char **get_section_name(u8 *out_count) {
-    struct dirent *directory_entry;  // Pointer for directory entry
+    struct dirent *directory_entry;
     char** section_list = (char**)malloc(sizeof(char*) * 64);
-    // opendir() returns a pointer of DIR type. 
+
     DIR *directory = opendir("sections");
 
-    if (directory == NULL)  // opendir returns NULL if couldn't open directory
+    if (directory == NULL)
     {
         printf("Could not open current directory");
         return NULL;
@@ -84,12 +84,36 @@ void remove_section(const char *name) {
     }
 }
 
-void get_list_apps(char * open_directory, u8 *out_count, char **list) {
-    struct dirent *directory_entry;  // Pointer for directory entry
-    // opendir() returns a pointer of DIR type. 
+void get_list(char * open_directory, u8 *out_count, char **list) {
+    struct dirent *directory_entry;
+    
     DIR *directory = opendir(open_directory);
 
-    if (directory == NULL)  // opendir returns NULL if couldn't open directory
+    if (directory == NULL)
+    {
+        return;
+    }
+    u8 count = 0;
+    while ((directory_entry = readdir(directory)) != NULL) {
+        if (strcmp(directory_entry->d_name, ".") == 0)
+            continue;
+
+        list[count++] = strdup(directory_entry->d_name);
+    }
+    closedir(directory);
+    qsort(list, count, sizeof(char *), [](const void *a, const void *b) {
+        return strcmp(*(const char **)a, *(const char **)b);
+    });
+    *out_count = count;
+    return;
+}
+
+void get_list_apps(char * open_directory, u8 *out_count, char **list) {
+    struct dirent *directory_entry;
+
+    DIR *directory = opendir(open_directory);
+
+    if (directory == NULL)
     {
         return;
     }
@@ -108,52 +132,42 @@ void get_list_apps(char * open_directory, u8 *out_count, char **list) {
                 return;
             }
             u8 checked = 0;
-            if(is_open_rom == 0) {
-                while (fgets(line, sizeof(line), file)) {
-                    if (line[0] == '\0') break; // exit if file is empty
-                    line[strcspn(line, "\n")] = '\0';
-                    if(checked) {
-                        if (strncmp(line, "title=", 6) == 0) {
-                            list_name[count] = strdup(directory_entry->d_name);
-                            list[count++] = strdup(line + 6);
-                            checked = 0;
-                            break;
-                        }
-                    } else {
-                        if (strncmp(line, "exec=", 5) == 0) {
-                            struct stat st;
-                            if (stat(line + 5, &st) == 0 && S_ISREG(st.st_mode)) {
-                                package_name[count] = strdup(line+5);
-                                checked = 1;
-                                rewind(file);
-                                continue;
-                            }
+            while (fgets(line, sizeof(line), file)) {
+                if (line[0] == '\0') break; // exit if file is empty
+                line[strcspn(line, "\n")] = '\0';
+                if(checked) {
+                    if (strncmp(line, "title=", 6) == 0) {
+                        list_name[count] = strdup(directory_entry->d_name);
+                        list[count++] = strdup(line + 6);
+                        checked = 0;
+                        break;
+                    }
+                } else {
+                    if (strncmp(line, "exec=", 5) == 0) {
+                        struct stat st;
+                        if (stat(line + 5, &st) == 0 && S_ISREG(st.st_mode)) {
+                            package_name[count] = strdup(line+5);
+                            checked = 1;
+                            rewind(file);
+                            continue;
                         }
                     }
                 }
-            }
-            else {
-                list[count++] = strdup(directory_entry->d_name);
             }
             fclose(file);
         }
     }
     closedir(directory);
-    if(is_open_rom == 1) {
-        qsort(list, count, sizeof(char *), [](const void *a, const void *b) {
-            return strcmp(*(const char **)a, *(const char **)b);
-        });
-    }
     *out_count = count;
     return;
 }
 
 void get_list_file(const char * open_directory, u8 *out_count, char **list) {
-    struct dirent *directory_entry;  // Pointer for directory entry
-    // opendir() returns a pointer of DIR type. 
+    struct dirent *directory_entry;
+
     DIR *directory = opendir(open_directory);
 
-    if (directory == NULL)  // opendir returns NULL if couldn't open directory
+    if (directory == NULL)
     {
         return;
     }
@@ -251,7 +265,7 @@ void clear_list_app() {
 
 void load_rom_list() {
     u8 list_count = 0;
-    get_list_apps(dir,&list_count,list_rom);
+    get_list(dir,&list_count,list_rom);
     max_rom_list = list_count;
 }
 
