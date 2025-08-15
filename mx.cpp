@@ -204,8 +204,8 @@ void get_command() {
     while(fgets(line,sizeof(line),file)) {
         line[strcspn(line, "\n")] = '\0';
         if (strncmp(line,"exec=", 5) == 0) {
-            strcpy(command,".");
-            strcat(command, strrchr(line + 5, '/'));
+            strcpy(command, "./");
+            strcat(command, basename(line + 5));
             strcat(command, " ");
             strcpy(binary_path, dirname(line + 5));
         }
