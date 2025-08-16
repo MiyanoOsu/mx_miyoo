@@ -541,7 +541,16 @@ void set_volume_value(u8 val) {
 }
 
 #include <sys/mman.h>
-#include <bitset>
+
+u32 get_cpu_mhz(u32 reg) {
+    reg &= 0x0003FFFF;                   // discard stored MHz bits
+    u32 n = ((reg >> 8) & 0x1F) + 1;     // Nf+1
+    u32 k = ((reg >> 4) & 0x03) + 1;     // Kf+1
+    u32 m = (reg & 0x03) + 1;            // Mf+1
+    u32 p = 1 << ((reg >> 16) & 0x03);   // P
+    u32 hz = 24000000UL * n * k / (m * p);
+    return hz / 1000000;
+}
 
 void set_CPU(u8 values) {
     u32 oc_table[] {
@@ -550,17 +559,21 @@ void set_CPU(u8 values) {
     // 27:18 are 10bit non-affecting space thus starting to read "int mhz" value here "(MHz << 18)" up to last 32bit.
     // ((24 * N * K) << 18) | (Nf << 8) | (Kf << 4) | (Mf << 0) | (Pf << 16),
     //
+        (216 << 18) | (8 << 8) | (0 << 4),
         (408 << 18) | (16 << 8) | (0 << 4),
-        (720 << 18) | (29 << 8) | (0 << 4)
+        (744 << 18) | (30 << 8) | (0 << 4),
     };
-    volatile u8 memdev = open("/dev/mem", O_RDWR);
+    volatile int memdev = open("/dev/mem", O_RDWR);
     if (memdev > 0) {
         u32 *mem = (u32*)mmap(0, 0x1000, PROT_READ | PROT_WRITE, MAP_SHARED, memdev, 0x01c20000);
         if (mem == MAP_FAILED) {
             printf("Could not mmap hardware registers!");
             return;
+        } else if(get_cpu_mhz(mem[0]) != 408) {
+            // if cpu has been set, do nothing
         } else {
             mem[0] = (1 << 31) | (oc_table[values] & 0x0003ffff);
+            //printf("New CPU clock: %u MHz\n",get_cpu_mhz(mem[0]));
         }
         munmap(mem, 0x1000);
     } else {
