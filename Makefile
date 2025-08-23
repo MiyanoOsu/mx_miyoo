@@ -10,7 +10,7 @@ VPATH = ./
 
 CFLAGS = -I. -O2 `sdl-config --cflags`
 
-LDFLAGS = `sdl-config --libs` -lSDL_ttf -lSDL_image
+LDFLAGS = `sdl-config --libs` -lSDL_ttf -lSDL_image -lstdc++
 
 all: $(TARGET)
 

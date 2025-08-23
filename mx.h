@@ -32,6 +32,7 @@ u8 get_battery_status();
 u8 get_backlight_value();
 void set_backlight_value(u8 val);
 u8 get_volume_value();
+s16 update_text_pos(char *filename, u16 index);
 void set_volume_value(u8 val);
 void set_CPU(u8 values);
 

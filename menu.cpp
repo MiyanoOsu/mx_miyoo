@@ -262,16 +262,16 @@ void draw_menu() {
         if(offset > 0)
             draw_string("↑", layout, 15, 50, selection);
         if(max_rom_list < MAX_VISIBLE_LIST) {
-            for(u16 i = 0; i < max_rom_list; i++) {
+            for(u8 i = 0; i < max_rom_list; i++) {
                 if(i == rom_index)
-                    draw_string(list_rom[i], layout, 35, 20 + (i - offset) * 20, selection);
+                    draw_string(list_rom[i], layout, update_text_pos(list_rom[i], i), 20 + (i - offset) * 20, selection);
                 else
                     draw_string(list_rom[i], layout, 35, 20 + (i - offset) * 20, text);
             }
         } else {
             for(u16 i = offset; i < offset + MAX_VISIBLE_LIST; i++) {
                 if(i == rom_index)
-                    draw_string(list_rom[i], layout, 35, 20 + (i - offset) * 20, selection);
+                    draw_string(list_rom[i], layout, update_text_pos(list_rom[i], i), 20 + (i - offset) * 20, selection);
                 else
                     draw_string(list_rom[i], layout, 35, 20 + (i - offset) * 20, text);
             }
@@ -295,14 +295,14 @@ void draw_menu() {
             if(max_file_list < MAX_VISIBLE_LIST) {
                 for(u8 i = 0; i < max_file_list; i++) {
                     if(i == file_list_index)
-                        draw_string(list_file[i], layout, 35, 20 + (i - file_list_offset) * 20, selection);
+                        draw_string(list_file[i], layout, update_text_pos(list_file[i], i), 20 + (i - file_list_offset) * 20, selection);
                     else
                         draw_string(list_file[i], layout, 35, 20 + (i - file_list_offset) * 20, text);
                 }
             } else {
-                for(u8 i = file_list_offset; i < file_list_offset + MAX_VISIBLE_LIST; i++) {
+                for(u16 i = file_list_offset; i < file_list_offset + MAX_VISIBLE_LIST; i++) {
                     if(i == file_list_index)
-                        draw_string(list_file[i], layout, 35, 20 + (i - file_list_offset) * 20, selection);
+                        draw_string(list_file[i], layout, update_text_pos(list_file[i], i), 20 + (i - file_list_offset) * 20, selection);
                     else
                         draw_string(list_file[i], layout, 35, 20 + (i - file_list_offset) * 20, text);
                 }

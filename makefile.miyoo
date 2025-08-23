@@ -10,7 +10,7 @@ VPATH = ./
 
 CFLAGS = -I. -O2 `sdl-config --cflags` -march=armv5te -mtune=arm926ej-s -DMIYOO
 
-LDFLAGS = `sdl-config --libs` -lSDL_ttf -lSDL_image -march=armv5te -mtune=arm926ej-s
+LDFLAGS = `sdl-config --libs` -lSDL_ttf -lSDL_image -march=armv5te -mtune=arm926ej-s -lstdc++
 
 all: $(TARGET)
 

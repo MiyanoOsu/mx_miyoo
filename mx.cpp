@@ -540,6 +540,31 @@ void set_volume_value(u8 val) {
 	}
 }
 
+#include "font.h"
+
+s16 update_text_pos(char *filename, u16 index) {
+    static s16 pos_x = 35;
+    static u16 old_index = index;
+    static u8 frame = 0;
+    // reset when index change
+    if( old_index != index) {
+        old_index = index;
+        pos_x = 35;
+        frame = 0;
+    }
+    // check if legth text in pixel is long
+    if(get_text_width(filename) >= 320 - 35) {
+        frame++;
+        if(frame > 20) {
+            pos_x -= 1;
+            frame = 0;
+        }
+        if(pos_x < 245 - get_text_width(filename))
+            pos_x = 35;
+    }
+    return pos_x;
+}
+
 #include <sys/mman.h>
 
 u32 get_cpu_mhz(u32 reg) {
