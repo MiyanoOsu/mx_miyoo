@@ -325,6 +325,12 @@ void draw_menu() {
         else if(is_open_color_changing) {
             draw_string("Save colors successfull!", layout, 35, 0, warning);
         }
+
+        if(check_access_folder()) {
+            draw_string("Enable access folder!", layout, 35, 0, warning);
+        } else {
+            draw_string("Disable access folder!", layout, 35, 0, warning);
+        }
     }
 
     SDL_BlitSurface(battery_state, NULL, layout,[](){

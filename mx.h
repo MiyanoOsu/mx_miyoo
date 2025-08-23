@@ -33,6 +33,9 @@ u8 get_backlight_value();
 void set_backlight_value(u8 val);
 u8 get_volume_value();
 s16 update_text_pos(char *filename, u16 index);
+u8 check_access_folder();
+void enable_access_folder();
+void remove_access_folder();
 void set_volume_value(u8 val);
 void set_CPU(u8 values);
 

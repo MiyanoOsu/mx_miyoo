@@ -193,6 +193,61 @@ void get_list_file(const char * open_directory, u8 *out_count, char **list) {
     return;
 }
 
+u8 check_access_folder() {
+    char path[256];
+    snprintf(path,sizeof(path),"sections/%s/%s",menu_title[section_index],list_name[link_index]);
+    FILE* file = fopen(path,"r");
+    if(!file) {
+        printf("path not found");
+        return 0;
+    }
+    char line[256];
+    while (fgets(line, sizeof(line), file)) {
+        if(strncmp(line,"selectordir=", 12) == 0) {
+            return 1;
+        }
+    }
+    return 0;
+}
+
+void enable_access_folder() {
+    char path[256];
+    snprintf(path,sizeof(path),"sections/%s/%s",menu_title[section_index],list_name[link_index]);
+    FILE* file = fopen(path,"a");
+    if(!file) {
+        perror("path not found");
+        return;
+    }
+    const char *line = "selectordir=/mnt";
+    if (fputs(line, file) == EOF) {
+        perror("Error writing to file");
+    }
+    fclose(file);
+}
+
+void remove_access_folder() {
+    char path[256];
+    snprintf(path,sizeof(path),"sections/%s/%s",menu_title[section_index],list_name[link_index]);
+    FILE* file = fopen(path,"r");
+    if(!file) {
+        printf("path not found");
+        return;
+    }
+    char lines[256][256];
+    int count = 0;
+    while(fgets(lines[count],sizeof(lines[count]),file)) {
+        if(strncmp(lines[count],"selectordir=", 12) != 0) {
+            count++;
+        }
+    }
+    fclose(file);
+    file = fopen(path,"w");
+    for (int i = 0; i < count; i++) {
+        fputs(lines[i], file);
+    }
+    fclose(file);
+}
+
 void get_command() {
     char path[256];
     snprintf(path,sizeof(path),"sections/%s/%s",menu_title[section_index],list_name[link_index]);
@@ -604,7 +659,7 @@ void save_rom_path() {
     fclose(file);
     file = fopen(path,"w");
     for (int i = 0; i < count; i++) {
-        fprintf(file,lines[i]);
+        fputs(lines[i], file);
     }
     fclose(file);
 }

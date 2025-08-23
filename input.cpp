@@ -465,6 +465,15 @@ void handle_input() {
                         done_massage = 1;
                     }
                 }
+                if (event.key.keysym.sym == BTN_SELECT) {
+                    if(check_access_folder()) {
+                        remove_access_folder();
+                        done_massage = 1;
+                    } else {
+                        enable_access_folder();
+                        done_massage = 1;
+                    }
+                }
             break;
         }
     }
