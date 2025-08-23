@@ -34,7 +34,6 @@ extern u8 is_empty_rom_folder;
 extern u8 is_open_setting;
 extern u8 is_open_file_list;
 extern u8 is_empty_folder_file;
-extern u8 have_load_folder;
 extern u8 is_open_remap;
 extern u8 is_open_install;
 extern u8 message_waiting;

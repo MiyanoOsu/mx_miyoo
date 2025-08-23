@@ -281,17 +281,16 @@ void handle_input() {
                             load_list_app(section_index);
                             if(max_link == 0 && section_index != max_entry - 2)
                                 is_empty_link = 1;
+                        } else if(check_access_folder() == 0) {
+                            get_command();
+                            run_command();
                         } else if(is_open_rom == 0 && is_open_install == 0) {
                             get_command();
                             is_open_section = 0;
                             is_open_link = 0;
-                            if(have_load_folder == 1) {
-                                update_bg = 1;
-                                is_open_rom = 1;
-                                load_rom_list();
-                            } else {
-                                run_command();
-                            }
+                            update_bg = 1;
+                            is_open_rom = 1;
+                            load_rom_list();
                         } else if(is_open_install == 0) {
                             run_command();
                         }
@@ -335,11 +334,10 @@ void handle_input() {
                         is_open_section = 1;
                         is_open_setting = 1;
                         init_config();
-                    } else if(is_open_rom == 1 && have_load_folder == 1){
+                    } else if(is_open_rom == 1){
                         is_open_rom = 0;
                         is_open_section = 1;
                         is_open_link = 1;
-                        have_load_folder = 0;
                         clear_rom_list();
                         if(max_rom_list == 0)
                             is_empty_rom_folder = 0;

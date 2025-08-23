@@ -18,10 +18,7 @@
 u8 max_entry = 2;
 u8 max_link = 0;
 u16 max_rom_list = 0;
-u8 have_load_folder = 0;
 u16 max_file_list = 0;
-
-u8 is_default_folder = 0;
 
 u8 current_line = 0;
 u8 done_massage = 0;
@@ -196,32 +193,38 @@ void get_list_file(const char * open_directory, u8 *out_count, char **list) {
 u8 check_access_folder() {
     char path[256];
     snprintf(path,sizeof(path),"sections/%s/%s",menu_title[section_index],list_name[link_index]);
+    
     FILE* file = fopen(path,"r");
     if(!file) {
         printf("path not found");
         return 0;
     }
+
     char line[256];
     while (fgets(line, sizeof(line), file)) {
         if(strncmp(line,"selectordir=", 12) == 0) {
             return 1;
         }
     }
+
     return 0;
 }
 
 void enable_access_folder() {
     char path[256];
     snprintf(path,sizeof(path),"sections/%s/%s",menu_title[section_index],list_name[link_index]);
+    
     FILE* file = fopen(path,"a");
     if(!file) {
         perror("path not found");
         return;
     }
+    
     const char *line = "selectordir=/mnt";
     if (fputs(line, file) == EOF) {
         perror("Error writing to file");
     }
+    
     fclose(file);
 }
 
@@ -233,6 +236,7 @@ void remove_access_folder() {
         printf("path not found");
         return;
     }
+    
     char lines[256][256];
     int count = 0;
     while(fgets(lines[count],sizeof(lines[count]),file)) {
@@ -241,10 +245,12 @@ void remove_access_folder() {
         }
     }
     fclose(file);
+    
     file = fopen(path,"w");
     for (int i = 0; i < count; i++) {
         fputs(lines[i], file);
     }
+
     fclose(file);
 }
 
@@ -272,12 +278,9 @@ void get_command() {
             struct stat st;
             if (stat(line + 12, &st) == 0 && S_ISDIR(st.st_mode)) {
                 strcpy(dir,line + 12);
-                is_default_folder = 0;
             } else {
                 strcpy(dir,getenv("HOME"));
-                is_default_folder = 1;
             }
-            have_load_folder = 1;
         }
     }
     fclose(file);
@@ -665,36 +668,32 @@ void save_rom_path() {
 }
 
 void run_command() {
-    load_folder:
     struct stat st;
-    if(have_load_folder && is_default_folder == 1) {
-        char path[256];
-        snprintf(path, sizeof(path), "%s/%s", dir, list_rom[rom_index]);
-        if (stat(path, &st) == 0 && S_ISDIR(st.st_mode)) {
-            strcat(dir, "/");
-            strcat(dir, list_rom[rom_index]);
-            realpath(dir, dir);
-            update_bg = 1;
-            clear_rom_list();
-            load_rom_list();
-        } else {
-            is_default_folder = 0;
-            save_rom_path();
-        }
-    }
-    if(have_load_folder && is_default_folder == 0) {
-        if (stat(list_rom[rom_index], &st) == 0 && S_ISDIR(st.st_mode)) {
-            is_default_folder = 1;
-            goto load_folder;
-        }
+    char path[256];
+    snprintf(path, sizeof(path), "%s/%s", dir, list_rom[rom_index]);
+    if (stat(path, &st) == 0 && S_ISDIR(st.st_mode)) {
+        strcat(dir, "/");
+        strcat(dir, list_rom[rom_index]);
+        realpath(dir, dir);
+        update_bg = 1;
+        clear_rom_list();
+        load_rom_list();
+    } else if(stat(path, &st) == 0 && S_ISREG(st.st_mode)){
         strcat(command, "\"");
         strcat(command, dir);
         strcat(command, "/");
         strcat(command, list_rom[rom_index]);
         strcat(command, "\"");
-        have_load_folder = 0;
-    }
-    if(have_load_folder == 0) {
+        save_rom_path();
+        chdir(binary_path);
+        close_font();
+        close_video();
+        clear_rom_list();
+        clear_list_app();
+        clear_file_list();
+        done = 1;
+        system(command);
+    } else {
         chdir(binary_path);
         close_font();
         close_video();

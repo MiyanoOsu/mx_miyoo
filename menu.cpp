@@ -326,9 +326,11 @@ void draw_menu() {
             draw_string("Save colors successfull!", layout, 35, 0, warning);
         }
 
-        if(check_access_folder()) {
+        if(check_access_folder() && is_open_install == 0) {
             draw_string("Enable access folder!", layout, 35, 0, warning);
-        } else {
+        }
+
+        else if(check_access_folder() == 0 && is_open_install == 0) {
             draw_string("Disable access folder!", layout, 35, 0, warning);
         }
     }
