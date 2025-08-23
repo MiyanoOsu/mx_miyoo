@@ -1,7 +1,0 @@
-title=IO tester
-description=Input tester, prints output keys
-exec=/mnt/apps/iotester/io.sh
-selectordir=/mnt/apps/iotester/
-selectorbrowser=false
-selectorfilter=_iotester
-selectoraliases=/mnt/apps/iotester/aliases.txt

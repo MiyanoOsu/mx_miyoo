@@ -1,0 +1,24 @@
+#  author MiyanoOsu
+#  github https://github.com/MiyanoOsu/mx_miyoo
+#  GPL-2.0 license
+
+####################      MX     #############################
+
+A SDL legacy frontend for miyoo cfw which i created from scratch
+
+#############################################################
+if you want MiyooCFW boot to MX as default frontend
+copy file /mnt/apps/mx/autoexec.sh to /mnt
+
+
+To install packages
+Place all packages .ipk to folder /mnt/apps/mx/install
+then install it in settings menu 
+
+Press X at applications to uninstall it
+START to save settings inside menu Change colors
+or menu Change buttons after edit it
+L or R to scroll list faster
+Press SELECT at applications to make it access folder
+
+Hope you like it!!! :3

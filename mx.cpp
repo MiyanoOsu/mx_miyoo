@@ -302,12 +302,126 @@ void clear_install_info() {
     done_massage = 0;
 }
 
+void scanning(const char *path, char **list, u16 *count) {
+    struct dirent *entry;
+    DIR *dp = opendir(path);
+
+    if (dp == NULL) {
+        perror("Error when open directory");
+        return;
+    }
+    
+    while ((entry = readdir(dp))) {
+        if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0)
+            continue;
+
+        char fullpath[512];
+        snprintf(fullpath, sizeof(fullpath), "%s/%s", path, entry->d_name);
+
+        struct stat statbuf;
+        if (stat(fullpath, &statbuf) == -1) {
+            perror("stat");
+            continue;
+        }
+
+        if (S_ISDIR(statbuf.st_mode)) {
+            // found directory → recurse
+            scanning(fullpath, list, count);
+        } else {
+            // found file, add to array
+            list[*count] = strdup(fullpath);
+            (*count)++;
+        }
+    }
+
+    closedir(dp);
+    return;
+}
+
+#include <sys/sendfile.h>
+
+void copy_file(const char *src, const char *dst) {
+    int src_fd, dst_fd;
+    struct stat stat_buf;
+    off_t offset = 0;
+
+    // open source file
+    src_fd = open(src, O_RDONLY);
+    if (src_fd < 0) {
+        perror("Error when open source file");
+        return;
+    }
+
+    // get size of source file
+    if (fstat(src_fd, &stat_buf) < 0) {
+        perror("fstat get size failed");
+        close(src_fd);
+        return;
+    }
+
+    // open destination file
+    dst_fd = open(dst, O_WRONLY | O_CREAT | O_TRUNC, stat_buf.st_mode);
+    if (dst_fd < 0) {
+        perror("Failed to open destination file");
+        close(src_fd);
+        return;
+    }
+
+    // copy using sendfile
+    if (sendfile(dst_fd, src_fd, &offset, stat_buf.st_size) < 0) {
+        perror("Error when sending file");
+        close(src_fd);
+        close(dst_fd);
+        return;
+    }
+
+    close(src_fd);
+    close(dst_fd);
+    return;
+}
+
+char *short_path(const char *fullpath) {
+    static char result[128];
+    char pathcopy1[128];
+    char pathcopy2[128];
+
+    // make two separate copies because dirname() and basename() modify them
+    strncpy(pathcopy1, fullpath, sizeof(pathcopy1));
+    strncpy(pathcopy2, fullpath, sizeof(pathcopy2));
+
+    char *dir = dirname(pathcopy1);   // modifies pathcopy1
+    char *base = basename(pathcopy2); // modifies pathcopy2
+
+    // find last folder name inside dir
+    char *lastslash = strrchr(dir, '/');
+
+    if (lastslash != NULL && *(lastslash + 1) != '\0') {
+        snprintf(result, sizeof(result), "%s/%s", lastslash, base);
+    } else {
+        snprintf(result, sizeof(result), "/%s", base);
+    }
+
+    return result;
+}
+
 void install_ipk() {
     char cmd[512] = "/usr/bin/opkg install --force-reinstall --force-overwrite \"install/";
     strcat(cmd,list_file[file_list_index]);
     strcat(cmd, "\"");
+
     FILE *fp;
     char buffer[256];
+    char* before_list[256];
+    char* after_list[256];
+    u16 max_list_before = 0, max_list_after = 0;
+
+    install_info[current_line] = strdup("Processing...");
+    current_line++;
+    update_video();
+
+    scanning("/mnt/gmenu2x/sections", before_list, &max_list_before);
+
+    // remount folder / as read write
     if (mount("/", "/", NULL, MS_REMOUNT, NULL) != 0)
         perror("remount as rw failed");
 
@@ -316,15 +430,38 @@ void install_ipk() {
         perror("popen failed");
         return;
     }
+
     while (fgets(buffer, sizeof(buffer), fp) != NULL) {
         buffer[strcspn(buffer, "\n")] = '\0';
         install_info[current_line] = strdup(buffer);
         current_line++;
         update_video();
     }
+
     pclose(fp);
+
+    // remount folder / as read only
     if (mount("/", "/", NULL, MS_REMOUNT | MS_RDONLY, NULL) != 0)
         perror("remount as ro failed");
+
+    scanning("/mnt/gmenu2x/sections", after_list, &max_list_after);
+
+    for (int i = 0; i < max_list_after; i++) {
+        u8 found = 0;
+        for (int j = 0; j < max_list_before; j++) {
+            if (strcmp(after_list[i], before_list[j]) == 0) {
+                found = 1;
+                break;
+            }
+        }
+        if (!found) {
+            char src[256], dst[256];
+            snprintf(src, sizeof(src), "/mnt/gmenu2x/sections%s", short_path(after_list[i]));
+            snprintf(dst, sizeof(dst), "/mnt/apps/mx/sections%s", short_path(after_list[i]));
+            printf("%s\n",short_path(after_list[i]));
+            copy_file(src, dst);
+        }
+    }
     done_massage = 1;
 }
 
@@ -332,6 +469,9 @@ void uninstall_ipk() {
     char cmd[256];
     char package[128];
     char buffer[128];
+    char* before_list[256];
+    char* after_list[256];
+    u16 max_list_before = 0, max_list_after = 0;
 
     snprintf(cmd, sizeof(cmd), "/usr/bin/opkg search \"*%s\" | cut -f1 -d' '",basename(package_name[link_index]));
 
@@ -343,8 +483,11 @@ void uninstall_ipk() {
 
     if (fgets(buffer, sizeof(buffer), fp) != NULL) {
         strcpy(package, buffer);
+        install_info[current_line] = strdup("Searching packages...");
+        current_line++;
+        update_video();
     }
-    
+
     pclose(fp);
 
     if(package[0] == '\0') {
@@ -352,6 +495,8 @@ void uninstall_ipk() {
         is_open_install = 0;
         return;
     }
+
+    scanning("/mnt/gmenu2x/sections", before_list, &max_list_before);
 
     if (mount("/", "/", NULL, MS_REMOUNT, NULL) != 0)
         perror("remount as rw failed");
@@ -371,6 +516,24 @@ void uninstall_ipk() {
     pclose(fp);
     if (mount("/", "/", NULL, MS_REMOUNT | MS_RDONLY, NULL) != 0)
         perror("remount as ro failed");
+
+    scanning("/mnt/gmenu2x/sections", after_list, &max_list_after);
+
+    for (int j = 0; j < max_list_before; j++) {
+        int found = 0;
+        for (int i = 0; i < max_list_after; i++) {
+            if (strcmp(before_list[j], after_list[i]) == 0) {
+                found = 1;
+                break;
+            }
+        }
+        if (!found) {
+            char package_removed[256];
+            snprintf(package_removed, sizeof(package_removed), "/mnt/apps/mx/sections%s", short_path(before_list[j]));
+            printf("%s\n",short_path(before_list[j]));
+            remove(package_removed);
+        }
+    }
 
     done_massage = 1;
 }
@@ -545,20 +708,28 @@ void set_volume_value(u8 val) {
 s16 update_text_pos(char *filename, u16 index) {
     static s16 pos_x = 35;
     static u16 old_index = index;
+#ifndef MIYOO
     static u8 frame = 0;
+#endif
     // reset when index change
     if( old_index != index) {
         old_index = index;
         pos_x = 35;
+#ifndef MIYOO
         frame = 0;
+#endif
     }
     // check if legth text in pixel is long
     if(get_text_width(filename) >= 320 - 35) {
+#ifndef MIYOO
         frame++;
         if(frame > 20) {
             pos_x -= 1;
             frame = 0;
         }
+#else
+        pos_x-=1;
+#endif
         if(pos_x < 245 - get_text_width(filename))
             pos_x = 35;
     }
