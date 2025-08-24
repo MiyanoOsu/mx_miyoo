@@ -130,7 +130,7 @@ void handle_input() {
                     if(is_open_setting == 1 && setting_index == 3) {
                         update_bg = 1;
                         option.font_size -= 1;
-                        if (option.font_size < 0) option.font_size = 0;
+                        if (option.font_size < 9) option.font_size = 9;
                         load_font();
                         save_config();
                     } else if(is_open_setting == 1 && setting_index == 4) {
