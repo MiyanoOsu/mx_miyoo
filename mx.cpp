@@ -133,7 +133,7 @@ void get_list_apps(char * open_directory, u8 *out_count, char **list) {
             u8 checked = 0;
             while (fgets(line, sizeof(line), file)) {
                 if (line[0] == '\0') break; // exit if file is empty
-                line[strcspn(line, "\n")] = '\0';
+                line[strcspn(line, "\n\r")] = '\0';
                 if(checked) {
                     if (strncmp(line, "title=", 6) == 0) {
                         list_name[count] = strdup(directory_entry->d_name);
@@ -260,26 +260,36 @@ void get_command() {
     FILE* file = fopen(path,"r");
     if(!file) {
         printf("path not found");
+        return;
     }
     char line[128];
+    command[0] = '\0';
+    binary_path[0] = '\0';
+    dir[0] = '\0';
     while(fgets(line,sizeof(line),file)) {
-        line[strcspn(line, "\n")] = '\0';
+        line[strcspn(line, "\n\r")] = '\0';
         if (strncmp(line,"exec=", 5) == 0) {
-            strcpy(command, "./");
-            strcat(command, basename(line + 5));
-            strcat(command, " ");
-            strcpy(binary_path, dirname(line + 5));
+            char execpath[256];
+            strncpy(execpath, line + 5, sizeof(execpath) - 1);
+            execpath[sizeof(execpath) - 1] = '\0';
+
+            // extract basename and dirname safely
+            char *base = basename(execpath);
+            char *dirn = dirname(execpath);
+
+            snprintf(command, sizeof(command), "./%s ", base);
+            snprintf(binary_path, sizeof(binary_path), "%s", dirn);
         }
         if (strncmp(line,"params=", 7) == 0) {
-            strcat(command, line + 7);
-            strcat(command, " ");
+            size_t len = strlen(command);
+            snprintf(command + len, sizeof(command) - len, "%s ", line + 7);
         }
         if(strncmp(line,"selectordir=", 12) == 0) {
             struct stat st;
             if (stat(line + 12, &st) == 0 && S_ISDIR(st.st_mode)) {
-                strcpy(dir,line + 12);
+                snprintf(dir, sizeof(dir), "%s", line + 12);
             } else {
-                strcpy(dir,getenv("HOME"));
+                snprintf(dir, sizeof(dir), "%s", getenv("HOME"));
             }
         }
     }
@@ -672,18 +682,14 @@ void run_command() {
     char path[256];
     snprintf(path, sizeof(path), "%s/%s", dir, list_rom[rom_index]);
     if (stat(path, &st) == 0 && S_ISDIR(st.st_mode)) {
-        strcat(dir, "/");
-        strcat(dir, list_rom[rom_index]);
-        realpath(dir, dir);
+        char newdir[256];
+        snprintf(newdir, sizeof(newdir), "%s/%s", dir, list_rom[rom_index]);
+        realpath(newdir, dir);
         update_bg = 1;
         clear_rom_list();
         load_rom_list();
     } else if(stat(path, &st) == 0 && S_ISREG(st.st_mode)){
-        strcat(command, "\"");
-        strcat(command, dir);
-        strcat(command, "/");
-        strcat(command, list_rom[rom_index]);
-        strcat(command, "\"");
+        snprintf(command, sizeof(command), "%s \"%s/%s\"", command, dir, list_rom[rom_index]);
         save_rom_path();
         chdir(binary_path);
         close_font();
