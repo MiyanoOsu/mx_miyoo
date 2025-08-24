@@ -15,7 +15,7 @@ int get_text_width(char *text) {
 }
 
 void load_font() {
-    font = TTF_OpenFont(option.font, 16);
+    font = TTF_OpenFont(option.font, option.font_size);
     if (!font) {
         printf( "Font load error: %s\n", TTF_GetError());
         exit(1);
@@ -38,6 +38,8 @@ void draw_string(const char *string, SDL_Surface *surface, s16 x, s16 y, SDL_Col
     //    font_color.r,
     //    font_color.g,
     //    font_color.b);
+
+    // graphics dirty rectangles
     if (dirty_count == 0) {
         dirty_rects[dirty_count].x = 301;
         dirty_rects[dirty_count].y = 2;

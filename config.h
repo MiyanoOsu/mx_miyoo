@@ -7,6 +7,7 @@ typedef struct {
 	u16 buttons[14];
     char bg[128];
     char font[256];
+    s16 font_size;
     s16 transparent;
     s16 text_red;
     s16 text_green;

@@ -128,18 +128,24 @@ void handle_input() {
                 }
                 if (event.key.keysym.sym == BTN_LEFT) {
                     if(is_open_setting == 1 && setting_index == 3) {
+                        update_bg = 1;
+                        option.font_size -= 1;
+                        if (option.font_size < 0) option.font_size = 0;
+                        load_font();
+                        save_config();
+                    } else if(is_open_setting == 1 && setting_index == 4) {
                         u8 val = get_backlight_value();
                         val--;
                         if (val < 1) val = 1;
                         set_backlight_value(val);
-                    } else if(is_open_setting == 1 && setting_index == 4) {
+                    } else if(is_open_setting == 1 && setting_index == 5) {
                         u8 val = get_volume_value();
                         val--;
                         if (val < 1) val = 1;
                         set_volume_value(val);
-                    } else if(is_open_setting == 1 && setting_index == 5) {
+                    } else if(is_open_setting == 1 && setting_index == 6) {
                         update_bg = 1;
-                        option.transparent-=4;
+                        option.transparent -= 4;
                         if (option.transparent < 0) option.transparent = 0;
                         set_transparent();
                         save_config();
@@ -174,18 +180,24 @@ void handle_input() {
                 }
                 if (event.key.keysym.sym == BTN_RIGHT) {
                     if(is_open_setting == 1 && setting_index == 3) {
+                        update_bg = 1;
+                        option.font_size += 1;
+                        if (option.font_size > 25) option.font_size = 25;
+                        load_font();
+                        save_config();
+                    } else if(is_open_setting == 1 && setting_index == 4) {
                         u8 val = get_backlight_value();
                         val++;
                         if (val > 9) val = 9;
                         set_backlight_value(val);
-                    } else if(is_open_setting == 1 && setting_index == 4) {
+                    } else if(is_open_setting == 1 && setting_index == 5) {
                         u8 val = get_volume_value();
                         val++;
                         if (val > 9) val = 9;
                         set_volume_value(val);
-                    } else if(is_open_setting == 1 && setting_index == 5) {
+                    } else if(is_open_setting == 1 && setting_index == 6) {
                         update_bg = 1;
-                        option.transparent+=4;
+                        option.transparent += 4;
                         if (option.transparent > 255) option.transparent = 255;
                         set_transparent();
                         save_config();
@@ -262,12 +274,12 @@ void handle_input() {
                         is_open_section = 0;
                         is_open_setting = 0;
                         load_font_list();
-                    } else if(is_open_setting == 1 && setting_index == 6) {
+                    } else if(is_open_setting == 1 && setting_index == 7) {
                         update_bg = 1;
                         is_open_color_changing = 1;
                         is_open_section = 0;
                         is_open_setting = 0;
-                    } else if(is_open_setting == 1 && setting_index == 7) {
+                    } else if(is_open_setting == 1 && setting_index == 8) {
                         update_bg = 1;
                         is_open_remap = 1;
                         is_open_section = 0;

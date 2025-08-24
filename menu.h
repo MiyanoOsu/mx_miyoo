@@ -17,7 +17,7 @@ extern char* install_info[];
 extern char background_path[];
 extern char font_path[];
 
-#define MAX_SETTING_LIST 8
+#define MAX_SETTING_LIST 9
 
 void draw_menu();
 

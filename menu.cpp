@@ -5,11 +5,12 @@
 #include "menu.h"
 #include "mx.h"
 
-const char *menu_title[64] = {"settings","exit"};
+const char *menu_title[64] = {"settings","poweroff"};
 const char *setting_title[64] = {
     "Install apps",
     "Change background",
     "Change fonts",
+    "Fonts size",
     "Backlight",
     "Volume",
     "Transparent",
@@ -109,10 +110,11 @@ void draw_menu() {
 
     if(is_open_setting) {
         draw_string("→",layout, 136, 35 + section_index * 20, selection);
-        char buf_backlight[3], buf_volume[3], buf_transparent[4];
+        char buf_fontsize[3], buf_backlight[3], buf_volume[3], buf_transparent[4];
+        snprintf(buf_fontsize, sizeof(buf_fontsize), "%u", option.font_size);
         snprintf(buf_backlight, sizeof(buf_backlight), "%u", get_backlight_value());
         snprintf(buf_volume, sizeof(buf_volume), "%u", get_volume_value());
-        snprintf(buf_transparent, sizeof(buf_transparent),"%u",option.transparent);
+        snprintf(buf_transparent, sizeof(buf_transparent), "%u", option.transparent);
         for(u8 i = 0; i< MAX_SETTING_LIST; i++) {
             if(i == setting_index)
                 draw_string(setting_title[i], layout, 160, 35 + i * 20, selection);
@@ -120,20 +122,25 @@ void draw_menu() {
                 draw_string(setting_title[i], layout, 160, 35 + i * 20, text);
 
             if(setting_index == 3)
-                draw_string(buf_backlight, layout, 280, 35 + 3 * 20, selection);
+                draw_string(buf_fontsize, layout, 280, 35 + 3 * 20, selection);
             else
-                draw_string(buf_backlight, layout, 280, 35 + 3 * 20, text);
+                draw_string(buf_fontsize, layout, 280, 35 + 3 * 20, text);
 
             if(setting_index == 4)
-                draw_string(buf_volume, layout, 280, 35 + 4 * 20, selection);
+                draw_string(buf_backlight, layout, 280, 35 + 4 * 20, selection);
             else
-                draw_string(buf_volume, layout, 280, 35 + 4 * 20, text);
+                draw_string(buf_backlight, layout, 280, 35 + 4 * 20, text);
 
             if(setting_index == 5)
-                draw_string(buf_transparent, layout, 280, 35 + 5 * 20, selection);
+                draw_string(buf_volume, layout, 280, 35 + 5 * 20, selection);
             else
-                draw_string(buf_transparent, layout, 280, 35 + 5 * 20, text);
-                
+                draw_string(buf_volume, layout, 280, 35 + 5 * 20, text);
+
+            if(setting_index == 6)
+                draw_string(buf_transparent, layout, 280, 35 + 6 * 20, selection);
+            else
+                draw_string(buf_transparent, layout, 280, 35 + 6 * 20, text);
+            
         }
     }
     

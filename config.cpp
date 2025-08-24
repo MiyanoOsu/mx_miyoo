@@ -53,6 +53,7 @@ void load_config() {
         strcpy(option.bg, background_path);
         load_default_font();
         strcpy(option.font, font_path);
+        option.font_size = 16;
         option.transparent = 190;
         option.text_red = 255;
         option.text_green = 255;
