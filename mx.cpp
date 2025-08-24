@@ -125,7 +125,7 @@ void get_list_apps(char * open_directory, u8 *out_count, char **list) {
             char path[256];
             snprintf(path, sizeof(path), "%s/%s",open_directory, directory_entry->d_name);
             FILE* file = fopen(path,"r");
-            char line[128];
+            char line[256];
             if (!file) {
                 printf("Check path pls");
                 return;
