@@ -778,9 +778,9 @@ void set_volume_value(u8 val) {
 
 s16 update_text_pos(char *filename, u16 index) {
     static s16 pos_x = 35;
-    static u16 old_index = index;
+    u16 old_index = index;
 #ifndef MIYOO
-    static u8 frame = 0;
+    u8 frame = 0;
 #endif
     // reset when index change
     if( old_index != index) {
