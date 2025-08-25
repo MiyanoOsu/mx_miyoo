@@ -211,7 +211,7 @@ void draw_menu() {
         
         if(remap_offset + MAX_VISIBLE_LIST - 1 < 14)
             draw_string("↓", layout, 5, 50, selection);
-        if(offset > 0)
+        if(remap_offset > 0)
             draw_string("↑", layout, 15, 50, selection);
 
         for(u8 i = remap_offset; i < remap_offset + MAX_VISIBLE_LIST - 1; i++) {
