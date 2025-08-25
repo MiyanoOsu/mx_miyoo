@@ -9,6 +9,8 @@
 extern SDL_Rect dirty_rects[];
 extern u8 dirty_count;
 
+extern u8 update_special_symbol;
+
 int get_text_width(char *text);
 void load_font();
 void init_font();

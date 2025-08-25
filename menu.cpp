@@ -53,6 +53,7 @@ s16 file_list_offset = 0;
 s8 remap_offset = 0;
 
 #define MAX_VISIBLE_LIST 10
+u8 update_special_symbol = 0;
 
 const char* return_text_button(u32 button) {
     switch(button) {
@@ -226,19 +227,31 @@ void draw_menu() {
     }
 
     if(is_open_link) {
+        update_special_symbol = 1;
         draw_string("→",layout, 136, 35 + section_index * 20, selection);
         if(is_empty_link)
             draw_string("<empty>",layout, 160, 35, text);
         else {
             if(link_index < link_offset)
                 link_offset = link_index;
+
             if (link_index >= link_offset + MAX_VISIBLE_LIST - 2)
                 link_offset = link_index - MAX_VISIBLE_LIST + 2 + 1;
             
-            if(link_offset + MAX_VISIBLE_LIST - 2 < max_link)
+            if(link_offset + MAX_VISIBLE_LIST - 2 < max_link) {
+                update_special_symbol = 1;
                 draw_string("↓", layout, 5, 50, selection);
-            if(link_offset > 0)
+            }
+
+            if(link_offset + MAX_VISIBLE_LIST - 2 == max_link) {
+                update_bg = 1;
+            }
+
+            if(link_offset > 0) {
+                update_special_symbol = 1;
                 draw_string("↑", layout, 15, 50, selection);
+            }
+
             if(max_link < MAX_VISIBLE_LIST - 2) {
                 for(u8 i = 0; i < max_link; i++) {
                     if(i == link_index)

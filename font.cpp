@@ -33,7 +33,7 @@ u8 dirty_count = 0;
 void draw_string(const char *string, SDL_Surface *surface, s16 x, s16 y, SDL_Color font_color) {
     int w = 0, h = 0;
     TTF_SizeText(font, string, &w, &h);
-    SDL_Rect dst = {x,y,(u16)w,(u16)h};
+    SDL_Rect dst = {x, y, (u16)w, (u16)h};
     // printf("Font color: R=%d, G=%d, B=%d\n",
     //    font_color.r,
     //    font_color.g,
@@ -47,6 +47,16 @@ void draw_string(const char *string, SDL_Surface *surface, s16 x, s16 y, SDL_Col
         dirty_rects[dirty_count].h = 16;
         dirty_count++;
     }
+    if (update_special_symbol) {
+        if (dirty_count < MAX_DIRTY) {
+            dirty_rects[dirty_count].x = x;
+            dirty_rects[dirty_count].y = y;
+            dirty_rects[dirty_count].w = w;
+            dirty_rects[dirty_count].h = h;
+            dirty_count++;
+            update_special_symbol = 0;
+        }
+    }
     if(is_open_rom || is_open_file_list) {
         if (dirty_count < MAX_DIRTY) {
             dirty_rects[dirty_count].x = 35;
@@ -55,8 +65,15 @@ void draw_string(const char *string, SDL_Surface *surface, s16 x, s16 y, SDL_Col
             dirty_rects[dirty_count].h = h;
             dirty_count++;
         }
-    }
-    else {
+    } else if (is_open_link) {
+        if (dirty_count < MAX_DIRTY) {
+            dirty_rects[dirty_count].x = 160;
+            dirty_rects[dirty_count].y = y;
+            dirty_rects[dirty_count].w = 320-160;
+            dirty_rects[dirty_count].h = h;
+            dirty_count++;
+        }
+    } else {
         if (dirty_count < MAX_DIRTY) {
             dirty_rects[dirty_count].x = x;
             dirty_rects[dirty_count].y = y;

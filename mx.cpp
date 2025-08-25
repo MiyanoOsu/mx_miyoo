@@ -742,6 +742,10 @@ void set_backlight_value(u8 val) {
         fputs(buf,f);
         fclose(f);
     }
+    if(FILE *f = fopen("/mnt/.backlight.conf","w")) {
+        fputs(buf,f);
+        fclose(f);  
+    }
 }
 
 u8 get_volume_value() {
@@ -761,6 +765,13 @@ void set_volume_value(u8 val) {
 		ioctl(snd, MIYOO_SND_SET_VOLUME, volume);
 		close(snd);
 	}
+
+    char buf[3] = {0};
+    snprintf(buf, sizeof(buf), "%d\n", val);
+    if(FILE *f = fopen("/mnt/.volume.conf","w")) {
+        fputs(buf, f);
+        fclose(f);
+    }
 }
 
 #include "font.h"
