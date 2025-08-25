@@ -339,18 +339,20 @@ void draw_menu() {
     }
 
     if(done_massage) {
-        if(is_open_remap) {
+        if(is_open_remap && is_open_link == 0) {
             draw_string("Save keymap successfull!", layout, 35, 0, warning);
         }
-        else if(is_open_color_changing) {
+        else if(is_open_color_changing && is_open_link == 0) {
             draw_string("Save colors successfull!", layout, 35, 0, warning);
         }
 
-        if(check_access_folder() && is_open_install == 0) {
+        if(check_access_folder() && is_open_install == 0 && is_open_link) {
+            update_special_symbol = 1;
             draw_string("Enable access folder!", layout, 35, 0, warning);
         }
 
-        else if(check_access_folder() == 0 && is_open_install == 0) {
+        else if(check_access_folder() == 0 && is_open_install == 0 && is_open_link) {
+            update_special_symbol = 1;
             draw_string("Disable access folder!", layout, 35, 0, warning);
         }
     }

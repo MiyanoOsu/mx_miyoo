@@ -469,7 +469,6 @@ void handle_input() {
                     if(is_open_remap == 1) {
                         save_config();
                         done_massage = 1;
-                        
                     } else if (is_open_color_changing == 1) {
                         save_config();
                         done_massage = 1;
