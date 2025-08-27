@@ -357,7 +357,7 @@ void draw_menu() {
         }
     }
 
-    SDL_BlitSurface(battery_state, NULL, layout,[](){
+    SDL_BlitSurface(battery_state[get_battery_status()], NULL, layout,[](){
         static SDL_Rect r = {301, 2, 16, 16};
         return &r;
     }());

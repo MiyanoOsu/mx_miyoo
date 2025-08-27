@@ -3,7 +3,7 @@
 
 #include <SDL/SDL.h>
 
-extern SDL_Surface *screen, *layout, *battery_state;
+extern SDL_Surface *screen, *layout, *battery_state[];
 extern u8 update_bg;
 
 void load_bg();

@@ -6,7 +6,7 @@
 #include <SDL/SDL.h>
 #include <SDL/SDL_image.h>
 
-SDL_Surface *screen, *layout, *background, *layout_bg, *battery_state;
+SDL_Surface *screen, *layout, *background, *layout_bg, *battery_state[7];
 
 void load_bg() {
     background = IMG_Load(option.bg);
@@ -16,61 +16,28 @@ void load_bg() {
     }
 }
 
+const char *battery_image[7] = {
+    "battery/0.png",
+    "battery/1.png",
+    "battery/2.png",
+    "battery/3.png",
+    "battery/4.png",
+    "battery/5.png",
+    "battery/ac.png",
+};
+
+
+
 void set_transparent() {
     SDL_SetAlpha(layout_bg, SDL_SRCALPHA, option.transparent);
 }
 
 void load_battery() {
-    switch(get_battery_status()) {
-        case 0:
-            battery_state = IMG_Load("battery/0.png");
-            if(battery_state == NULL) {
-                printf("IMG_Load error: %s\n", IMG_GetError());
-                exit(-1);
-            }
-        break;
-        case 1:
-            battery_state = IMG_Load("battery/1.png");
-            if(battery_state == NULL) {
-                printf("IMG_Load error: %s\n", IMG_GetError());
-                exit(-1);
-            }
-        break;
-        case 2:
-            battery_state = IMG_Load("battery/2.png");
-            if(battery_state == NULL) {
-                printf("IMG_Load error: %s\n", IMG_GetError());
-                exit(-1);
-            }
-        break;
-        case 3:
-            battery_state = IMG_Load("battery/3.png");
-            if(battery_state == NULL) {
-                printf("IMG_Load error: %s\n", IMG_GetError());
-                exit(-1);
-            }
-        break;
-        case 4:
-            battery_state = IMG_Load("battery/4.png");
-            if(battery_state == NULL) {
-                printf("IMG_Load error: %s\n", IMG_GetError());
-                exit(-1);
-            }
-        break;
-        case 5:
-            battery_state = IMG_Load("battery/5.png");
-            if(battery_state == NULL) {
-                printf("IMG_Load error: %s\n", IMG_GetError());
-                exit(-1);
-            }
-        break;
-        case 6:
-            battery_state = IMG_Load("battery/ac.png");
-            if(battery_state == NULL) {
-                printf("IMG_Load error: %s\n", IMG_GetError());
-                exit(-1);
-            }
-        break;
+    for(u8 i = 0; i<7; i++) {
+        battery_state[i] = IMG_Load(battery_image[i]);
+        if(!battery_state[i]) {
+            printf("IMG_Load error: %s\n", IMG_GetError());
+        }
     }
 }
 

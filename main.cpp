@@ -12,12 +12,12 @@ int main() {
     init_font();
     init_video();
     load_section();
+    load_battery();
 #ifdef MIYOO
     set_CPU(2);
 #endif
     while(!done) {
         handle_input();
-        load_battery();
         update_video();
     }
     close_font();
