@@ -648,6 +648,21 @@ void load_bg_list() {
     u8 list_count = 0;
     get_list_file("background",&list_count,list_file);
     max_file_list = list_count;
+    
+    for(int i = 0; i< max_file_list; i++) {
+        if(strcmp(list_file[i], option.bg + 11)== 0) {
+            file_list_index = i;
+            break;
+        }
+    }
+
+    if(file_list_index > MAX_VISIBLE_LIST - 4) {
+        file_list_offset = file_list_index - 4;
+    }
+    if(max_file_list - file_list_offset < MAX_VISIBLE_LIST) {
+        file_list_offset = max_file_list - MAX_VISIBLE_LIST;
+    }
+    is_reset_moving_text = 1;
 }
 
 void load_default_bg() {
@@ -669,6 +684,22 @@ void load_font_list() {
     u8 list_count = 0;
     get_list_file("fonts",&list_count,list_file);
     max_file_list = list_count;
+    
+    for(int i = 0; i< max_file_list; i++) {
+        if(strcmp(list_file[i], option.font + 6)== 0) {
+            file_list_index = i;
+            break;
+        }
+    }
+    
+    if(file_list_index > MAX_VISIBLE_LIST - 4) {
+        file_list_offset = file_list_index - 4;
+    }
+    
+    if(max_file_list - file_list_offset < MAX_VISIBLE_LIST) {
+        file_list_offset = max_file_list - MAX_VISIBLE_LIST;
+    }
+    is_reset_moving_text = 1;
 }
 
 void load_default_font() {
