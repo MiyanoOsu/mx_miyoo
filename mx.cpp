@@ -9,11 +9,13 @@
 #include <libgen.h>
 #include <sys/mount.h>
 
+#ifdef MIYOO
 #define MIYOO_BATTERY   "/sys/class/power_supply/miyoo-battery/voltage_now"
 #define MIYOO_LID_CONF  "/sys/class/backlight/backlight/brightness"
 #define MIYOO_SND_FILE  "/dev/miyoo_snd"
 #define MIYOO_SND_GET_VOLUME  _IOWR(0x101, 0, unsigned long)
 #define MIYOO_SND_SET_VOLUME  _IOWR(0x100, 0, unsigned long)
+#endif
 
 u8 max_entry = 2;
 u8 max_link = 0;
@@ -786,6 +788,7 @@ void run_command() {
     }
 }
 
+#ifdef MIYOO
 u8 get_battery_status() {
 	int val = -1;
 	if (FILE *f = fopen(MIYOO_BATTERY, "r")) {
@@ -848,6 +851,7 @@ void set_volume_value(u8 val) {
         fclose(f);
     }
 }
+#endif
 
 #include "font.h"
 
@@ -883,6 +887,7 @@ s16 update_text_pos(char *filename, u16 index) {
     return pos_x;
 }
 
+#ifdef MIYOO
 #include <sys/mman.h>
 
 u32 get_cpu_mhz(u32 reg) {
@@ -924,3 +929,4 @@ void set_CPU(u8 values) {
     }
     close(memdev);
 }
+#endif
