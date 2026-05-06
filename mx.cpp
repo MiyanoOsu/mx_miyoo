@@ -4,7 +4,6 @@
 #include "menu.h"
 #include "video.h"
 #include "font.h"
-#include "mx.h"
 #include <dirent.h>
 #include <sys/ioctl.h>
 #include <libgen.h>
@@ -23,6 +22,7 @@ u16 max_file_list = 0;
 
 u8 current_line = 0;
 u8 done_massage = 0;
+u8 is_reset_moving_text = 0;
 
 char command[512];
 char dir[256];
@@ -819,8 +819,6 @@ void set_volume_value(u8 val) {
 }
 
 #include "font.h"
-
-u8 is_reset_moving_text = 0;
 
 s16 update_text_pos(char *filename, u16 index) {
     static s16 pos_x = 35;
