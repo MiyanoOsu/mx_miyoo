@@ -210,6 +210,27 @@ u8 check_access_folder() {
     return 0;
 }
 
+int load_last_rom_selection() {
+    char path[256];
+    snprintf(path,sizeof(path),"sections/%s/%s",menu_title[section_index],list_name[link_index]);
+    
+    FILE* file = fopen(path,"r");
+    if(!file) {
+        perror("path not found");
+        return -1;
+    }
+    char line[256];
+    int output_value = 0;
+    while(fgets(line,sizeof(line),file)) {
+        if(strncmp(line,"selectorelement=", 16) == 0) {
+            output_value = atoi(line+16);
+            break;
+        }
+    }
+    fclose(file);
+    return output_value;
+}
+
 void enable_access_folder() {
     char path[256];
     snprintf(path,sizeof(path),"sections/%s/%s",menu_title[section_index],list_name[link_index]);
@@ -339,6 +360,7 @@ void load_rom_list() {
     u8 list_count = 0;
     get_list(dir,&list_count,list_rom);
     max_rom_list = list_count;
+    rom_index = load_last_rom_selection();
 }
 
 void clear_rom_list() {
@@ -654,7 +676,7 @@ void set_font() {
     save_config();
 }
 
-void save_rom_path() {
+void save_rom_path(int index) {
     char path[256];
     snprintf(path,sizeof(path),"sections/%s/%s",menu_title[section_index],list_name[link_index]);
     FILE* file = fopen(path,"r");
@@ -663,16 +685,28 @@ void save_rom_path() {
     }
     char lines[256][256];
     int count = 0;
+    int is_selectorelement = 0;
+    
     while(fgets(lines[count],sizeof(lines[count]),file)) {
         if(strncmp(lines[count],"selectordir=", 12) == 0) {
             snprintf(lines[count],sizeof(lines[count]),"selectordir=%s\n",dir);
         }
+        // replace last played rom
+        if(strncmp(lines[count],"selectorelement=", 16) == 0) {
+            snprintf(lines[count], sizeof(lines[count]), "selectorelement=%d\n", index);
+            is_selectorelement = 1;
+        }
         count++;
     }
     fclose(file);
+
     file = fopen(path,"w");
     for (int i = 0; i < count; i++) {
         fputs(lines[i], file);
+    }
+    // if not exist, create one
+    if(!is_selectorelement) {
+        fprintf(file, "selectorelement=%d\n", index);
     }
     fclose(file);
 }
@@ -690,7 +724,7 @@ void run_command() {
         load_rom_list();
     } else if(stat(path, &st) == 0 && S_ISREG(st.st_mode)){
         snprintf(command, sizeof(command), "%s \"%s/%s\"", command, dir, list_rom[rom_index]);
-        save_rom_path();
+        save_rom_path(rom_index);
         chdir(binary_path);
         close_font();
         close_video();
