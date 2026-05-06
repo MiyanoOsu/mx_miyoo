@@ -18,6 +18,7 @@ extern char background_path[];
 extern char font_path[];
 
 #define MAX_SETTING_LIST 9
+#define MAX_VISIBLE_LIST 10
 
 void draw_menu();
 

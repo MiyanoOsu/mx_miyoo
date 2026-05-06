@@ -7,6 +7,7 @@ extern u16 max_rom_list;
 extern u16 max_file_list;
 extern u8 current_line;
 extern u8 done_massage;
+extern u8 is_reset_moving_text;
 
 void add_section(const char *name);
 void load_section();

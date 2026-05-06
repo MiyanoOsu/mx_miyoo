@@ -52,7 +52,6 @@ s32 offset = 0;
 s16 file_list_offset = 0;
 s8 remap_offset = 0;
 
-#define MAX_VISIBLE_LIST 10
 u8 update_special_symbol = 0;
 
 const char* return_text_button(u32 button) {

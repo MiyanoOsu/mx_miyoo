@@ -4,6 +4,7 @@
 #include "menu.h"
 #include "video.h"
 #include "font.h"
+#include "mx.h"
 #include <dirent.h>
 #include <sys/ioctl.h>
 #include <libgen.h>
@@ -361,6 +362,13 @@ void load_rom_list() {
     get_list(dir,&list_count,list_rom);
     max_rom_list = list_count;
     rom_index = load_last_rom_selection();
+    is_reset_moving_text = 1;
+    if(rom_index > MAX_VISIBLE_LIST - 4) {
+        offset = rom_index - 4;
+    }
+    if(max_rom_list - offset < MAX_VISIBLE_LIST) {
+        offset = max_rom_list - MAX_VISIBLE_LIST;
+    }
 }
 
 void clear_rom_list() {
@@ -370,6 +378,7 @@ void clear_rom_list() {
     }
     max_rom_list = 0;
     rom_index = 0;
+    offset = 0;
 }
 
 void clear_file_list() {
@@ -381,6 +390,7 @@ void clear_file_list() {
     file_list_index = 0;
     file_list_offset = 0;
     is_empty_folder_file = 0;
+    file_list_offset = 0;
 }
 
 void clear_install_info() {
@@ -810,6 +820,8 @@ void set_volume_value(u8 val) {
 
 #include "font.h"
 
+u8 is_reset_moving_text = 0;
+
 s16 update_text_pos(char *filename, u16 index) {
     static s16 pos_x = 35;
     static u16 old_index = index;
@@ -817,9 +829,10 @@ s16 update_text_pos(char *filename, u16 index) {
     static u8 frame = 0;
 #endif
     // reset when index change
-    if( old_index != index) {
+    if( old_index != index || is_reset_moving_text) {
         old_index = index;
         pos_x = 35;
+        is_reset_moving_text = 0;
 #ifndef MIYOO
         frame = 0;
 #endif
